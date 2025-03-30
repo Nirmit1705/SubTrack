@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Mail, Lock, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,11 +16,31 @@ import {
 export function LoginModal({ isOpen, onClose, onSwitchToSignup }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Use the navigate hook from react-router-dom
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // TODO: Handle login logic
-    console.log("Login with:", { email, password });
+    
+    // Set loading state
+    setIsLoading(true);
+    
+    // Simulate API call with timeout
+    setTimeout(() => {
+      // Store authentication state
+      localStorage.setItem('isAuthenticated', 'true');
+      
+      // Reset loading state
+      setIsLoading(false);
+      
+      // Close modal
+      onClose();
+      
+      // Navigate to dashboard
+      navigate('/dashboard');
+    }, 1500); // Simulated API delay
   };
 
   return (
@@ -44,6 +65,7 @@ export function LoginModal({ isOpen, onClose, onSwitchToSignup }) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -58,6 +80,7 @@ export function LoginModal({ isOpen, onClose, onSwitchToSignup }) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -66,9 +89,19 @@ export function LoginModal({ isOpen, onClose, onSwitchToSignup }) {
               <Button 
                 type="submit" 
                 className="w-full bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700"
+                disabled={isLoading}
               >
-                <LogIn className="mr-2 h-4 w-4" />
-                Log In
+                {isLoading ? (
+                  <>
+                    <span className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                    Logging In...
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Log In
+                  </>
+                )}
               </Button>
             </div>
           </div>
@@ -80,6 +113,7 @@ export function LoginModal({ isOpen, onClose, onSwitchToSignup }) {
                 type="button"
                 onClick={onSwitchToSignup}
                 className="text-purple-400 hover:text-purple-300 focus:outline-none"
+                disabled={isLoading}
               >
                 Sign Up
               </button>

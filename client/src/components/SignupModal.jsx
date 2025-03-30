@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Mail, Lock, User, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,16 +18,38 @@ export function SignupModal({ isOpen, onClose, onSwitchToLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Use the navigate hook from react-router-dom
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
     // Simple password validation
     if (password !== confirmPassword) {
       alert("Passwords don't match");
       return;
     }
-    // TODO: Handle signup logic
-    console.log("Signup with:", { name, email, password });
+    
+    // Set loading state
+    setIsLoading(true);
+    
+    // Simulate API call with timeout
+    setTimeout(() => {
+      // Store user data or auth token
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('user', JSON.stringify({ name, email }));
+      
+      // Reset loading state
+      setIsLoading(false);
+      
+      // Close modal
+      onClose();
+      
+      // Navigate to dashboard
+      navigate('/dashboard');
+    }, 1500); // Simulated API delay
   };
 
   return (
@@ -50,6 +73,7 @@ export function SignupModal({ isOpen, onClose, onSwitchToLogin }) {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -64,6 +88,7 @@ export function SignupModal({ isOpen, onClose, onSwitchToLogin }) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -78,6 +103,7 @@ export function SignupModal({ isOpen, onClose, onSwitchToLogin }) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -92,6 +118,7 @@ export function SignupModal({ isOpen, onClose, onSwitchToLogin }) {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -100,9 +127,19 @@ export function SignupModal({ isOpen, onClose, onSwitchToLogin }) {
               <Button 
                 type="submit" 
                 className="w-full bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700"
+                disabled={isLoading}
               >
-                <UserPlus className="mr-2 h-4 w-4" />
-                Sign Up
+                {isLoading ? (
+                  <>
+                    <span className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                    Creating Account...
+                  </>
+                ) : (
+                  <>
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Sign Up
+                  </>
+                )}
               </Button>
             </div>
           </div>
@@ -114,6 +151,7 @@ export function SignupModal({ isOpen, onClose, onSwitchToLogin }) {
                 type="button"
                 onClick={onSwitchToLogin}
                 className="text-purple-400 hover:text-purple-300 focus:outline-none"
+                disabled={isLoading}
               >
                 Log In
               </button>
