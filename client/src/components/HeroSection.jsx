@@ -1,8 +1,28 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Bell, Calendar, LineChart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { LoginModal } from '@/components/LoginModal';
+import { SignupModal } from '@/components/SignupModal';
 
 export function HeroSection() {
+  const [showLogin, setShowLogin] = useState(false);
+  const [showSignup, setShowSignup] = useState(false);
+
+  // Function to scroll to features section
+  const scrollToFeatures = () => {
+    // Find the features section element
+    const featuresSection = document.getElementById('features-section');
+    
+    // If found, scroll to it smoothly
+    if (featuresSection) {
+      featuresSection.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background gradient */}
@@ -37,6 +57,7 @@ export function HeroSection() {
             <Button
               size="lg"
               className="bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white"
+              onClick={() => setShowSignup(true)}
             >
               Get Started
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -45,7 +66,8 @@ export function HeroSection() {
             <Button
               variant="outline"
               size="lg"
-              className="border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800/50"
+              className="border-gray-700 text-white hover:text-white hover:bg-gray-800/50"
+              onClick={scrollToFeatures}
             >
               Learn More
             </Button>
@@ -75,6 +97,25 @@ export function HeroSection() {
           </motion.div>
         </motion.div>
       </div>
+
+      {/* Modals */}
+      <LoginModal 
+        isOpen={showLogin} 
+        onClose={() => setShowLogin(false)} 
+        onSwitchToSignup={() => {
+          setShowLogin(false);
+          setShowSignup(true);
+        }}
+      />
+
+      <SignupModal 
+        isOpen={showSignup} 
+        onClose={() => setShowSignup(false)} 
+        onSwitchToLogin={() => {
+          setShowSignup(false);
+          setShowLogin(true);
+        }}
+      />
     </div>
   );
 }
