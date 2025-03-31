@@ -1,92 +1,136 @@
-import { 
-  Music, 
-  Video, 
-  ShoppingBag, 
-  Cloud, 
-  Newspaper, 
-  BookOpen, 
-  Coffee, 
-  Gamepad2,
-  Dumbbell,
-  Globe,
-  Tv
-} from 'lucide-react';
+// Use only the most basic icons from lucide-react
+import { Video, Music, BookOpen, DollarSign, Globe } from 'lucide-react';
 
-// List of supported subscription services
+// Subscription services for dropdown
 export const subscriptionServices = [
-  { id: 1, name: 'Netflix', icon: Video, color: 'bg-red-600' },
-  { id: 2, name: 'Spotify', icon: Music, color: 'bg-green-600' },
-  { id: 3, name: 'Amazon Prime', icon: ShoppingBag, color: 'bg-blue-600' },
-  { id: 4, name: 'Disney+', icon: Tv, color: 'bg-blue-700' },
-  { id: 5, name: 'iCloud', icon: Cloud, color: 'bg-sky-500' },
-  { id: 6, name: 'NYTimes', icon: Newspaper, color: 'bg-gray-600' },
-  { id: 7, name: 'Audible', icon: BookOpen, color: 'bg-amber-600' },
-  { id: 8, name: 'Starbucks', icon: Coffee, color: 'bg-green-700' },
-  { id: 9, name: 'Xbox Game Pass', icon: Gamepad2, color: 'bg-green-600' },
-  { id: 10, name: 'Fitness+', icon: Dumbbell, color: 'bg-red-500' },
-  { id: 11, name: 'YouTube Premium', icon: Video, color: 'bg-red-500' },
-  { id: 12, name: 'HBO Max', icon: Tv, color: 'bg-purple-700' },
-  { id: 13, name: 'Other', icon: Globe, color: 'bg-gray-600' },
+  { id: 1, name: 'Netflix', icon: 'video', color: '#E50914', genre: 'entertainment' },
+  { id: 2, name: 'Spotify', icon: 'music', color: '#1DB954', genre: 'music' },
+  { id: 3, name: 'YouTube Premium', icon: 'video', color: '#FF0000', genre: 'entertainment' },
+  { id: 4, name: 'Coursera', icon: 'book', color: '#2A73CC', genre: 'educational' },
+  { id: 5, name: 'Disney+', icon: 'video', color: '#0063e5', genre: 'entertainment' },
+  { id: 6, name: 'Amazon Prime', icon: 'shopping', color: '#00A8E1', genre: 'shopping' },
+  { id: 7, name: 'Figma', icon: 'pen', color: '#F24E1E', genre: 'productivity' },
+  { id: 8, name: 'Slack', icon: 'message', color: '#4A154B', genre: 'productivity' },
+  { id: 9, name: 'Dropbox', icon: 'folder', color: '#0061FF', genre: 'productivity' },
+  { id: 10, name: 'Fitness+', icon: 'activity', color: '#FF0000', genre: 'fitness' },
+  { id: 11, name: 'HBO Max', icon: 'tv', color: '#6A0DAD', genre: 'entertainment' },
+  { id: 12, name: 'Other', icon: 'globe', color: '#808080', genre: 'other' },
 ];
 
-// Get the icon component for a service
-export function getServiceIcon(serviceName) {
-  const service = subscriptionServices.find(
-    (s) => s.name.toLowerCase() === serviceName.toLowerCase()
-  );
-  return service?.icon || Globe;
-}
-
-// Get the background color for a service
-export function getServiceColor(serviceName) {
-  const service = subscriptionServices.find(
-    (s) => s.name.toLowerCase() === serviceName.toLowerCase()
-  );
-  return service?.color || 'bg-gray-600';
-}
-
-// Sample subscription data
+// Sample data for subscriptions
 export const sampleSubscriptions = [
   {
     id: 1,
     name: 'Netflix',
     price: 14.99,
-    nextRenewal: '2023-04-15',
-    paymentMethod: 'Credit Card',
+    renewalDate: '2023-04-15',
+    paymentMethod: 'Visa •••• 4242',
+    icon: 'video',
+    color: '#E50914',
+    genre: 'entertainment'
   },
   {
     id: 2,
     name: 'Spotify',
     price: 9.99,
-    nextRenewal: '2023-04-20',
+    renewalDate: '2023-04-20',
     paymentMethod: 'PayPal',
+    icon: 'music',
+    color: '#1DB954',
+    genre: 'music'
   },
   {
     id: 3,
-    name: 'Amazon Prime',
-    price: 12.99,
-    nextRenewal: '2023-05-10',
-    paymentMethod: 'Credit Card',
+    name: 'YouTube Premium',
+    price: 11.99,
+    renewalDate: '2023-05-03',
+    paymentMethod: 'Mastercard •••• 5555',
+    icon: 'video',
+    color: '#FF0000',
+    genre: 'entertainment'
   },
   {
     id: 4,
-    name: 'Disney+',
-    price: 7.99,
-    nextRenewal: '2023-04-28',
-    paymentMethod: 'Credit Card',
+    name: 'Coursera',
+    price: 49.99,
+    renewalDate: '2023-05-10',
+    paymentMethod: 'Apple Pay',
+    icon: 'book',
+    color: '#2A73CC',
+    genre: 'educational'
   },
   {
     id: 5,
-    name: 'iCloud',
-    price: 2.99,
-    nextRenewal: '2023-05-02',
-    paymentMethod: 'Apple Pay',
+    name: 'Figma',
+    price: 15.00,
+    renewalDate: '2023-04-29',
+    paymentMethod: 'Visa •••• 4242',
+    icon: 'pen',
+    color: '#F24E1E',
+    genre: 'productivity'
   },
   {
     id: 6,
-    name: 'YouTube Premium',
-    price: 11.99,
-    nextRenewal: '2023-05-15',
-    paymentMethod: 'Google Pay',
-  },
+    name: 'Slack',
+    price: 8.00,
+    renewalDate: '2023-05-15',
+    paymentMethod: 'Mastercard •••• 5555',
+    icon: 'message',
+    color: '#4A154B',
+    genre: 'productivity'
+  }
 ];
+
+// Map string icon names to icon components
+export function getIconComponent(iconName) {
+  const iconMap = {
+    'video': Video,
+    'music': Music,
+    'book': BookOpen,
+    'dollar': DollarSign,
+    'globe': Globe
+  };
+  
+  return iconMap[iconName] || Globe;
+}
+
+// Get color for a service
+export function getServiceColor(name) {
+  const service = subscriptionServices.find(s => s.name === name);
+  return service?.color || '#808080';
+}
+
+// Helper functions for pie chart data
+export function getCategoryData(subscriptions) {
+  // Group subscriptions by genre and calculate total spending
+  const categories = subscriptions.reduce((acc, sub) => {
+    const genre = sub.genre || 'other';
+    if (!acc[genre]) {
+      acc[genre] = 0;
+    }
+    acc[genre] += sub.price || 0;
+    return acc;
+  }, {});
+  
+  // Convert to array format for the pie chart
+  return Object.keys(categories).map(genre => ({
+    name: genre,
+    value: categories[genre]
+  }));
+}
+
+// Category colors for pie chart
+export const categoryColors = {
+  'entertainment': '#E50914',
+  'music': '#1DB954',
+  'educational': '#2A73CC',
+  'productivity': '#4A154B',
+  'shopping': '#00A8E1',
+  'fitness': '#FF6B6B',
+  'other': '#808080'
+};
+
+// Get color for a category
+export function getCategoryColor(category) {
+  return categoryColors[category] || '#808080';
+}

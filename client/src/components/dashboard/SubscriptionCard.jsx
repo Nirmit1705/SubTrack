@@ -1,103 +1,174 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, CreditCard, Edit, MoreVertical, Trash2 } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { getServiceIcon, getServiceColor } from '@/lib/subscription-utils';
+import { CalendarDays, CreditCard, Edit2, Trash2, Globe, Music, Video, BookOpen } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { getServiceColor } from '@/lib/subscription-utils';
 
-export function SubscriptionCard({ subscription }) {
-  const { name, price, nextRenewal, paymentMethod } = subscription;
+// Genre icon mapping using emojis instead of icons for simplicity
+const genreIcons = {
+  'entertainment': '🎬',
+  'educational': '📚',
+  'productivity': '💼',
+  'music': '🎵',
+  'gaming': '🎮',
+  'news': '📰',
+  'shopping': '🛒',
+  'fitness': '💪',
+  'other': '🔍',
+};
+
+// Simple icon mapping
+const iconMap = {
+  'video': Video,
+  'music': Music,
+  'book': BookOpen,
+  'globe': Globe
+};
+
+export function SubscriptionCard({ subscription, viewMode = 'grid', onDelete, onEdit, delay = 0 }) {
   const [isHovered, setIsHovered] = useState(false);
+  const { id, name, price, renewalDate, paymentMethod, icon, color, genre } = subscription;
   
-  const Icon = getServiceIcon(name);
-  const bgColor = getServiceColor(name);
+  // Get the icon component with a simpler fallback
+  const IconComponent = iconMap[icon] || Globe;
   
-  // Format date to "Apr 15, 2023" format
-  const formattedDate = new Date(nextRenewal).toLocaleDateString('en-US', {
+  // Format date
+  const formattedDate = new Date(renewalDate).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric'
   });
+  
+  // Calculate days until renewal
+  const daysUntil = Math.ceil((new Date(renewalDate) - new Date()) / (1000 * 60 * 60 * 24));
+  
+  // Get renewal status text and color
+  const getRenewalStatus = () => {
+    if (daysUntil < 0) return { text: 'Overdue', color: 'text-red-500' };
+    if (daysUntil === 0) return { text: 'Due today', color: 'text-yellow-500' };
+    if (daysUntil <= 3) return { text: 'Due soon', color: 'text-yellow-500' };
+    return { text: `${daysUntil} days left`, color: 'text-green-500' };
+  };
+  
+  const renewalStatus = getRenewalStatus();
+  
+  if (viewMode === 'list') {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay }}
+        className="flex items-center justify-between bg-gray-800 rounded-xl p-4 hover:bg-gray-700 transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: color || getServiceColor(name) }}>
+            <IconComponent className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <h3 className="font-medium">{name}</h3>
+            <span className="text-sm capitalize text-gray-400">{genre}</span>
+          </div>
+        </div>
+        
+        <div className="hidden md:block text-center">
+          <div className="font-medium">${price.toFixed(2)}/mo</div>
+          <div className="text-xs text-gray-400">${(price * 12).toFixed(2)}/year</div>
+        </div>
+        
+        <div className="hidden md:flex items-center gap-2">
+          <CalendarDays className="h-4 w-4 text-gray-400" />
+          <span className="text-sm">{formattedDate}</span>
+        </div>
+        
+        <div className="hidden md:block">
+          <span className={`text-sm ${renewalStatus.color}`}>{renewalStatus.text}</span>
+        </div>
+        
+        <button
+          onClick={() => onDelete(id)}
+          className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+        >
+          <Trash2 className="h-4 w-4" />
+        </button>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      whileHover={{ y: -5, scale: 1.02 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay }}
+      whileHover={{ y: -5 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      className="group overflow-hidden rounded-xl border border-gray-800 bg-gray-900/50 backdrop-blur-sm transition-all duration-300"
+      className="overflow-hidden rounded-xl border border-gray-800 bg-gray-900/50 backdrop-blur-sm transition-all duration-300 hover:shadow-xl hover:shadow-purple-900/10"
     >
-      <div className="relative p-6">
-        {/* Subscription Logo */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
+      <div className="p-5">
+        <div className="flex justify-between items-start mb-4">
+          <div className="flex items-center gap-3">
             <div 
-              className={`flex h-12 w-12 items-center justify-center rounded-lg ${bgColor}`}
+              className="w-10 h-10 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: color || '#808080' }}
             >
-              <Icon className="h-6 w-6 text-white" />
+              <IconComponent className="h-5 w-5 text-white" />
             </div>
-            <div className="ml-4">
-              <h3 className="text-lg font-semibold text-white">{name}</h3>
-              <p className="text-2xl font-bold text-white">
-                ${parseFloat(price).toFixed(2)}
-                <span className="text-xs text-gray-400">/mo</span>
-              </p>
+            <div>
+              <h3 className="font-medium text-lg">{name}</h3>
+              <span className="text-sm capitalize text-gray-400">{genre}</span>
             </div>
           </div>
-
-          {/* Actions Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="text-gray-400 hover:text-white focus:outline-none">
-                <MoreVertical className="h-5 w-5" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-40 border-gray-700 bg-gray-900 text-gray-300">
-              <DropdownMenuItem className="hover:bg-gray-800 cursor-pointer">
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-gray-700" />
-              <DropdownMenuItem className="text-red-400 hover:bg-gray-800 hover:text-red-300 cursor-pointer">
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
-        {/* Subscription Details */}
-        <div className="mt-6 grid grid-cols-2 gap-3">
-          <div className="rounded-lg bg-gray-800/50 p-3">
-            <div className="flex items-center text-gray-400">
-              <Calendar className="mr-2 h-4 w-4" />
-              <span className="text-xs">Renewal</span>
-            </div>
-            <p className="mt-1 text-sm font-medium text-white">{formattedDate}</p>
-          </div>
-          <div className="rounded-lg bg-gray-800/50 p-3">
-            <div className="flex items-center text-gray-400">
-              <CreditCard className="mr-2 h-4 w-4" />
-              <span className="text-xs">Payment</span>
-            </div>
-            <p className="mt-1 text-sm font-medium text-white">
-              {paymentMethod}
-            </p>
+          
+          <div className="absolute top-4 right-4 bg-gray-800/60 backdrop-blur-sm text-xs font-medium px-2 py-1 rounded-full flex items-center">
+            <span className="mr-1">{genreIcons[genre] || '🔍'}</span>
+            <span className="capitalize">{genre}</span>
           </div>
         </div>
 
-        {/* Hover Gradient Effect */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: isHovered ? 1 : 0 }}
-          className="absolute inset-0 rounded-xl bg-gradient-to-tr from-purple-500/10 to-blue-500/10 pointer-events-none"
-        />
+        <div className="mt-6 flex items-end justify-between">
+          <div>
+            <div className="text-2xl font-bold">${price.toFixed(2)}</div>
+            <div className="text-xs text-gray-400">per month</div>
+          </div>
+          
+          <div className="text-right">
+            <div className={`text-sm font-medium ${renewalStatus.color}`}>
+              {renewalStatus.text}
+            </div>
+            <div className="text-xs text-gray-400 mt-1 flex items-center justify-end">
+              <CalendarDays className="h-3 w-3 mr-1" />
+              {formattedDate}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-between border-t border-gray-800 px-5 py-3 bg-gray-800/30">
+        <div className="text-xs text-gray-400 flex items-center">
+          <CreditCard className="h-3 w-3 mr-2" />
+          {paymentMethod || 'No payment method'}
+        </div>
+        
+        <div className={`flex gap-1 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+          {onEdit && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-6 w-6 p-0 text-gray-400 hover:text-white hover:bg-gray-700"
+              onClick={() => onEdit(subscription)}
+            >
+              <Edit2 className="h-3 w-3" />
+            </Button>
+          )}
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-6 w-6 p-0 text-gray-400 hover:text-red-500 hover:bg-gray-700"
+            onClick={() => onDelete(id)}
+          >
+            <Trash2 className="h-3 w-3" />
+          </Button>
+        </div>
       </div>
     </motion.div>
   );

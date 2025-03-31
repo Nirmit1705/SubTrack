@@ -66,7 +66,7 @@ export function HeroSection() {
             <Button
               variant="outline"
               size="lg"
-              className="border-gray-700 text-white hover:text-white hover:bg-gray-800/50"
+              className="border-gray-700 text-black hover:text-white hover:bg-gray-800/50"
               onClick={scrollToFeatures}
             >
               Learn More

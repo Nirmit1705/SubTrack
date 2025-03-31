@@ -14,7 +14,7 @@ export function Navbar() {
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-md border-b border-gray-800/50"
+      className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b border-gray-800/50"
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
@@ -36,7 +36,7 @@ export function Navbar() {
           {/* Login Button */}
           <Button 
             variant="outline" 
-            className="border-gray-700 hover:bg-gray-800 hover:text-white transition-colors"
+            className="border-gray-700 hover:bg-gray-800 hover:text-white transition-colors text-black"
             onClick={() => setShowLogin(true)}
           >
             <LogIn className="mr-2 h-4 w-4" />

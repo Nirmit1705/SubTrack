@@ -69,7 +69,7 @@ export function SignupModal({ isOpen, onClose, onSwitchToLogin }) {
                 <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   placeholder="Full Name"
-                  className="pl-10 bg-gray-800 border-gray-700"
+                  className="pl-10 bg-gray-800 border-gray-700 text-white"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
@@ -84,7 +84,7 @@ export function SignupModal({ isOpen, onClose, onSwitchToLogin }) {
                 <Input
                   type="email"
                   placeholder="Email"
-                  className="pl-10 bg-gray-800 border-gray-700"
+                  className="pl-10 bg-gray-800 border-gray-700 text-white"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -99,7 +99,7 @@ export function SignupModal({ isOpen, onClose, onSwitchToLogin }) {
                 <Input
                   type="password"
                   placeholder="Password"
-                  className="pl-10 bg-gray-800 border-gray-700"
+                  className="pl-10 bg-gray-800 border-gray-700 text-white"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -114,7 +114,7 @@ export function SignupModal({ isOpen, onClose, onSwitchToLogin }) {
                 <Input
                   type="password"
                   placeholder="Confirm Password"
-                  className="pl-10 bg-gray-800 border-gray-700"
+                  className="pl-10 bg-gray-800 border-gray-700 text-white"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required

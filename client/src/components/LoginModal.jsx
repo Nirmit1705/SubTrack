@@ -61,7 +61,7 @@ export function LoginModal({ isOpen, onClose, onSwitchToSignup }) {
                 <Input
                   type="email"
                   placeholder="Email"
-                  className="pl-10 bg-gray-800 border-gray-700"
+                  className="pl-10 bg-gray-800 border-gray-700 text-white"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -76,7 +76,7 @@ export function LoginModal({ isOpen, onClose, onSwitchToSignup }) {
                 <Input
                   type="password"
                   placeholder="Password"
-                  className="pl-10 bg-gray-800 border-gray-700"
+                  className="pl-10 bg-gray-800 border-gray-700 text-white"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
