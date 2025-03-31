@@ -4,9 +4,6 @@ import { DashboardNavbar } from './Navbar';
 import { SubscriptionCard } from './SubscriptionCard';
 import { FloatingButton } from './FloatingButton';
 import { AddSubscriptionModal } from './AddSubscriptionModal';
-import { Grid, List, Search } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { sampleSubscriptions, getCategoryData, getCategoryColor } from '@/lib/subscription-utils';
 
@@ -44,6 +41,7 @@ export function Dashboard() {
   // Find next upcoming renewal
   const upcomingRenewals = [...filteredSubscriptions]
     .sort((a, b) => new Date(a.renewalDate) - new Date(b.renewalDate))
+    .filter(sub => new Date(sub.renewalDate) >= new Date())
     .slice(0, 1);
   
   const nextRenewal = upcomingRenewals.length > 0 
@@ -61,7 +59,7 @@ export function Dashboard() {
   const handleAddSubscription = (newSubscription) => {
     const updatedSubscriptions = [...subscriptions, {
       ...newSubscription,
-      id: subscriptions.length + 1, // Generate ID (use UUID in production)
+      id: Date.now().toString(), // Generate unique ID
     }];
     setSubscriptions(updatedSubscriptions);
     setShowAddModal(false);
@@ -255,11 +253,18 @@ export function Dashboard() {
               <div className="flex w-full md:w-auto flex-col md:flex-row items-stretch md:items-center gap-3">
                 {/* Search */}
                 <div className="relative flex-grow">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-                  <Input
+                  <svg 
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <input
                     type="search"
                     placeholder="Search subscriptions..."
-                    className="pl-10 bg-gray-800 border-gray-700 w-full rounded-md"
+                    className="pl-10 py-2 bg-gray-800 border border-gray-700 w-full rounded-md text-white"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
@@ -267,22 +272,22 @@ export function Dashboard() {
                 
                 {/* View mode switcher */}
                 <div className="bg-gray-800 rounded-md flex items-center">
-                  <Button 
-                    variant="ghost"
-                    size="sm"
-                    className={`px-3 py-2 ${viewMode === 'grid' ? 'bg-gray-700' : ''}`}
+                  <button 
+                    className={`px-3 py-2 rounded-l-md ${viewMode === 'grid' ? 'bg-gray-700' : ''}`}
                     onClick={() => setViewMode('grid')}
                   >
-                    <Grid className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="ghost"
-                    size="sm"
-                    className={`px-3 py-2 ${viewMode === 'list' ? 'bg-gray-700' : ''}`}
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    </svg>
+                  </button>
+                  <button 
+                    className={`px-3 py-2 rounded-r-md ${viewMode === 'list' ? 'bg-gray-700' : ''}`}
                     onClick={() => setViewMode('list')}
                   >
-                    <List className="h-4 w-4" />
-                  </Button>
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    </svg>
+                  </button>
                 </div>
               </div>
             </div>
@@ -316,12 +321,12 @@ export function Dashboard() {
                 ) : (
                   <div className="space-y-4">
                     <p className="text-gray-400">You don't have any subscriptions yet.</p>
-                    <Button 
+                    <button 
                       onClick={() => setShowAddModal(true)}
-                      className="bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700"
+                      className="px-4 py-2 rounded-md bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white"
                     >
                       Add Your First Subscription
-                    </Button>
+                    </button>
                   </div>
                 )}
               </motion.div>

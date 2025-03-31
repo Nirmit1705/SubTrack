@@ -1,186 +1,183 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { motion, AnimatePresence } from 'framer-motion';
 import { subscriptionServices } from '@/lib/subscription-utils';
 
 export function AddSubscriptionModal({ isOpen, onClose, onAdd }) {
   const [formData, setFormData] = useState({
     name: '',
     price: '',
-    genre: '',
-    renewalDate: new Date().toISOString().split('T')[0],
-    paymentMethod: 'Credit Card',
-    icon: '',
-    color: ''
+    category: 'entertainment',
+    renewalDate: '',
+    website: '',
+    notes: ''
   });
 
-  // Extract unique genre values
-  const genres = [...new Set(subscriptionServices.map(service => service.genre))];
-
-  // When a service is selected, pre-fill other fields
-  const handleServiceSelect = (e) => {
-    const selectedService = subscriptionServices.find(
-      service => service.name === e.target.value
-    );
-    
-    if (selectedService) {
-      setFormData({
-        ...formData,
-        name: selectedService.name,
-        icon: selectedService.icon,
-        color: selectedService.color,
-        genre: selectedService.genre
-      });
-    }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === 'price' ? parseFloat(value) || '' : value
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onAdd({
       ...formData,
-      price: parseFloat(formData.price),
-      // Set default icon and genre if not selected
-      icon: formData.icon || 'globe',
-      genre: formData.genre || 'other'
+      price: parseFloat(formData.price) || 0
     });
-    // Reset form
     setFormData({
       name: '',
       price: '',
-      genre: '',
-      renewalDate: new Date().toISOString().split('T')[0],
-      paymentMethod: 'Credit Card',
-      icon: '',
-      color: ''
+      category: 'entertainment',
+      renewalDate: '',
+      website: '',
+      notes: ''
     });
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-gray-800 rounded-lg p-6 max-w-md w-full"
-      >
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Add New Subscription</h2>
-          <button 
-            onClick={onClose}
-            className="p-1 rounded-full bg-gray-700 hover:bg-gray-600"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Select Service</label>
-              <select
-                className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white"
-                onChange={handleServiceSelect}
-              >
-                <option value="">Select a service...</option>
-                {subscriptionServices.map(service => (
-                  <option key={service.id} value={service.name}>
-                    {service.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium mb-1">Name</label>
-              <Input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
-                className="bg-gray-700 border-gray-600"
-                placeholder="Netflix, Spotify, etc."
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Price ($/month)</label>
-              <Input
-                type="number"
-                value={formData.price}
-                onChange={(e) => setFormData({...formData, price: e.target.value})}
-                className="bg-gray-700 border-gray-600"
-                placeholder="9.99"
-                min="0.01"
-                step="0.01"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Category</label>
-              <select
-                value={formData.genre}
-                onChange={(e) => setFormData({...formData, genre: e.target.value})}
-                className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white"
-                required
-              >
-                <option value="">Select category</option>
-                {genres.map(genre => (
-                  <option key={genre} value={genre}>
-                    {genre.charAt(0).toUpperCase() + genre.slice(1)}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Payment Method</label>
-              <select
-                value={formData.paymentMethod}
-                onChange={(e) => setFormData({...formData, paymentMethod: e.target.value})}
-                className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white"
-              >
-                <option value="Credit Card">Credit Card</option>
-                <option value="Debit Card">Debit Card</option>
-                <option value="PayPal">PayPal</option>
-                <option value="Bank Transfer">Bank Transfer</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Next Renewal Date</label>
-              <Input
-                type="date"
-                value={formData.renewalDate}
-                onChange={(e) => setFormData({...formData, renewalDate: e.target.value})}
-                className="bg-gray-700 border-gray-600"
-                required
-              />
-            </div>
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          className="bg-gray-900 rounded-xl shadow-xl w-full max-w-md p-6"
+        >
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold text-white">Add New Subscription</h2>
+            <button onClick={onClose} className="text-gray-400 hover:text-white">
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
 
-          <div className="mt-6 flex justify-end space-x-3">
-            <Button
-              type="button"
-              onClick={onClose}
-              className="bg-gray-700 hover:bg-gray-600"
-            >
-              Cancel
-            </Button>
-            <Button 
-              type="submit"
-              className="bg-purple-600 hover:bg-purple-700"
-            >
-              Add Subscription
-            </Button>
-          </div>
-        </form>
-      </motion.div>
+          <form onSubmit={handleSubmit}>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-400 mb-1">
+                  Subscription Name *
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  className="w-full p-2 bg-gray-800 border border-gray-700 rounded-md text-white"
+                  placeholder="Netflix, Spotify, etc."
+                  value={formData.name}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="price" className="block text-sm font-medium text-gray-400 mb-1">
+                  Monthly Price *
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
+                  <input
+                    id="price"
+                    name="price"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    required
+                    className="w-full p-2 pl-8 bg-gray-800 border border-gray-700 rounded-md text-white"
+                    placeholder="9.99"
+                    value={formData.price}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="category" className="block text-sm font-medium text-gray-400 mb-1">
+                  Category
+                </label>
+                <select
+                  id="category"
+                  name="category"
+                  className="w-full p-2 bg-gray-800 border border-gray-700 rounded-md text-white"
+                  value={formData.category}
+                  onChange={handleChange}
+                >
+                  <option value="entertainment">Entertainment</option>
+                  <option value="productivity">Productivity</option>
+                  <option value="utilities">Utilities</option>
+                  <option value="education">Education</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="renewalDate" className="block text-sm font-medium text-gray-400 mb-1">
+                  Next Renewal Date *
+                </label>
+                <input
+                  id="renewalDate"
+                  name="renewalDate"
+                  type="date"
+                  required
+                  className="w-full p-2 bg-gray-800 border border-gray-700 rounded-md text-white"
+                  value={formData.renewalDate}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="website" className="block text-sm font-medium text-gray-400 mb-1">
+                  Website (optional)
+                </label>
+                <input
+                  id="website"
+                  name="website"
+                  type="url"
+                  className="w-full p-2 bg-gray-800 border border-gray-700 rounded-md text-white"
+                  placeholder="https://example.com"
+                  value={formData.website}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="notes" className="block text-sm font-medium text-gray-400 mb-1">
+                  Notes (optional)
+                </label>
+                <textarea
+                  id="notes"
+                  name="notes"
+                  rows="2"
+                  className="w-full p-2 bg-gray-800 border border-gray-700 rounded-md text-white"
+                  placeholder="Any additional notes..."
+                  value={formData.notes}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 border border-gray-600 rounded-md text-gray-300 hover:bg-gray-800"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 rounded-md bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white"
+              >
+                Add Subscription
+              </button>
+            </div>
+          </form>
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }
