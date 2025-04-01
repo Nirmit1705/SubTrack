@@ -30,8 +30,6 @@ const SubscriptionSchema = new mongoose.Schema({
       'music',
       'gaming',
       'shopping',
-      'fitness',
-      'news',
       'other'
     ],
     default: 'other'
@@ -44,21 +42,9 @@ const SubscriptionSchema = new mongoose.Schema({
     type: String,
     default: '#808080'
   },
-  paymentMethod: {
-    type: String,
-    default: ''
-  },
-  description: {
-    type: String,
-    default: ''
-  },
-  active: {
-    type: Boolean,
-    default: true
-  },
   billingCycle: {
     type: String,
-    enum: ['monthly', 'yearly', 'quarterly', 'weekly'],
+    enum: ['monthly', 'yearly', 'quarterly'],
     default: 'monthly'
   },
   reminderEnabled: {
@@ -67,7 +53,9 @@ const SubscriptionSchema = new mongoose.Schema({
   },
   reminderDaysBefore: {
     type: Number,
-    default: 3
+    default: 3,
+    min: 0,
+    max: 30
   }
 }, { timestamps: true });
 
@@ -79,10 +67,30 @@ SubscriptionSchema.virtual('annualCost').get(function() {
     return this.price;
   } else if (this.billingCycle === 'quarterly') {
     return this.price * 4;
-  } else if (this.billingCycle === 'weekly') {
-    return this.price * 52;
   }
   return this.price * 12; // Default to monthly
 });
+
+// Virtual for next reminder date
+SubscriptionSchema.virtual('reminderDate').get(function() {
+  if (!this.reminderEnabled) return null;
+  
+  const reminderDate = new Date(this.renewalDate);
+  reminderDate.setDate(reminderDate.getDate() - this.reminderDaysBefore);
+  return reminderDate;
+});
+
+// Method to check if reminder should be sent today
+SubscriptionSchema.methods.shouldSendReminder = function() {
+  if (!this.reminderEnabled) return false;
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const reminderDate = this.reminderDate;
+  reminderDate.setHours(0, 0, 0, 0);
+  
+  return reminderDate.getTime() === today.getTime();
+};
 
 module.exports = mongoose.model('Subscription', SubscriptionSchema);

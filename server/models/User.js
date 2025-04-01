@@ -21,17 +21,13 @@ const UserSchema = new mongoose.Schema({
     minlength: [6, 'Password must be at least 6 characters long'],
     select: false // Don't return password in queries by default
   },
-  profileImage: {
-    type: String,
-    default: '' // URL to default profile image
-  },
   budget: {
     type: Number,
     default: 100 // Default monthly budget
   },
   currency: {
     type: String,
-    default: 'USD'
+    default: 'INR'
   },
   createdAt: {
     type: Date,
