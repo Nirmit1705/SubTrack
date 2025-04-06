@@ -121,16 +121,40 @@ export function getCategoryData(subscriptions) {
 
 // Category colors for pie chart
 export const categoryColors = {
-  'entertainment': '#E50914',
-  'music': '#1DB954',
-  'educational': '#2A73CC',
-  'productivity': '#4A154B',
-  'shopping': '#00A8E1',
+  'entertainment': '#8B5CF6', // purple
+  'music': '#EC4899', // pink
+  'educational': '#F59E0B', // amber
+  'education': '#F59E0B', // amber
+  'productivity': '#3B82F6', // blue
+  'shopping': '#F43F5E', // rose
   'fitness': '#FF6B6B',
-  'other': '#808080'
+  'utilities': '#10B981', // green
+  'gaming': '#6366F1', // indigo
+  'other': '#6B7280' // gray
 };
 
-// Get color for a category
+// Get color for a category (KEEP ONLY THIS VERSION)
 export function getCategoryColor(category) {
-  return categoryColors[category] || '#808080';
+  return categoryColors[category] || categoryColors.other;
 }
+
+// Format date for display
+export const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+};
+
+// Calculate monthly cost based on billing cycle
+export const calculateMonthlyCost = (price, billingCycle) => {
+  if (billingCycle === 'yearly') {
+    return price / 12;
+  } else if (billingCycle === 'quarterly') {
+    return price / 3;
+  } else {
+    return price; // monthly
+  }
+};

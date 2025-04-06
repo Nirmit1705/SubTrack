@@ -12,44 +12,71 @@ import {
   ModalDescription,
   ModalFooter,
 } from "@/components/ui/modal";
+import authService from '@/services/authService';
 
-export function SignupModal({ isOpen, onClose, onSwitchToLogin }) {
+// Modify the function parameters to include a default for onSuccess
+export function SignupModal({ 
+  isOpen, 
+  onClose, 
+  onSuccess = () => {
+    console.log('Default onSuccess handler, navigating to dashboard');
+    window.location.href = '/dashboard';
+  }, 
+  onSwitchToLogin 
+}) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   
   // Use the navigate hook from react-router-dom
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Simple password validation
+    // Log the form data to ensure it's correct
+    console.log('Form data before submission:', { name, email, password, confirmPassword });
+    
+    setError('');
+    
+    // Basic validation
     if (password !== confirmPassword) {
-      alert("Passwords don't match");
+      setError('Passwords do not match');
       return;
     }
     
-    // Set loading state
-    setIsLoading(true);
-    
-    // Simulate API call with timeout
-    setTimeout(() => {
-      // Store user data or auth token
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('user', JSON.stringify({ name, email }));
+    try {
+      setIsLoading(true);
+      console.log('Starting registration...');
       
-      // Reset loading state
+      // Register the user
+      const response = await authService.register({
+        name,
+        email,
+        password
+      });
+      
+      console.log('Registration successful', response);
+      console.log('Auth status:', authService.isAuthenticated());
+      
+      // Important: Call onSuccess callback to trigger redirect
+      console.log('Calling navigation logic');
+      if (typeof onSuccess === 'function') {
+        onSuccess();
+      } else {
+        console.log('onSuccess is not available, using navigate hook instead');
+        // Use the navigate hook as a fallback
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      setError(error.response?.data?.message || 'Signup failed. Please try again.');
+    } finally {
       setIsLoading(false);
-      
-      // Close modal
-      onClose();
-      
-      // Navigate to dashboard
-      navigate('/dashboard');
-    }, 1500); // Simulated API delay
+    }
   };
 
   return (

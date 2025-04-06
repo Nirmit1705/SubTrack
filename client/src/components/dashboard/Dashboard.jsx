@@ -5,7 +5,37 @@ import { SubscriptionCard } from './SubscriptionCard';
 import { FloatingButton } from './FloatingButton';
 import { AddSubscriptionModal } from './AddSubscriptionModal';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { sampleSubscriptions, getCategoryData, getCategoryColor } from '@/lib/subscription-utils';
+import subscriptionService from '@/services/subscriptionService';
+import { getCategoryColor } from '@/lib/subscription-utils';
+
+// Add this function before your Dashboard component
+const getCategoryData = (subscriptions) => {
+  // Group subscriptions by category and sum prices
+  const categoryMap = {};
+  
+  subscriptions.forEach(sub => {
+    const category = sub.category || 'other';
+    if (!categoryMap[category]) {
+      categoryMap[category] = 0;
+    }
+    
+    // Handle different billing cycles
+    let monthlyAmount = sub.price;
+    if (sub.billingCycle === 'yearly') {
+      monthlyAmount = sub.price / 12;
+    } else if (sub.billingCycle === 'quarterly') {
+      monthlyAmount = sub.price / 3;
+    }
+    
+    categoryMap[category] += monthlyAmount;
+  });
+  
+  // Convert the map to an array for the chart
+  return Object.keys(categoryMap).map(category => ({
+    name: category,
+    value: categoryMap[category]
+  }));
+};
 
 export function Dashboard() {
   // State management
@@ -14,12 +44,30 @@ export function Dashboard() {
   const [viewMode, setViewMode] = useState('grid'); // grid or list
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredSubscriptions, setFilteredSubscriptions] = useState([]);
-  const [selectedSubscription, setSelectedSubscription] = useState(null);
+  const [statistics, setStatistics] = useState({
+    totalMonthly: 0,
+    totalYearly: 0,
+    categorySummary: {}
+  });
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Load sample subscriptions on mount
+  // Fetch subscriptions and statistics
   useEffect(() => {
-    // In a real app, you would fetch from API instead
-    setSubscriptions(sampleSubscriptions || []);
+    const fetchData = async () => {
+      try {
+        const allSubscriptions = await subscriptionService.getAllSubscriptions();
+        const stats = await subscriptionService.getStatistics();
+        
+        setSubscriptions(allSubscriptions);
+        setStatistics(stats);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
   }, []);
 
   // Filter subscriptions based on search query
@@ -55,19 +103,41 @@ export function Dashboard() {
   const budget = 120; // Example fixed budget
   const percentUsed = Math.min(100, Math.round((totalMonthly / budget) * 100));
   
-  // Add new subscription handler
-  const handleAddSubscription = (newSubscription) => {
-    const updatedSubscriptions = [...subscriptions, {
-      ...newSubscription,
-      id: Date.now().toString(), // Generate unique ID
-    }];
-    setSubscriptions(updatedSubscriptions);
-    setShowAddModal(false);
+  // Handle adding a new subscription
+  const handleAddSubscription = async (newSubscription) => {
+    try {
+      console.log('Creating subscription:', newSubscription);
+      // Include all required fields
+      const completeSubscription = {
+        ...newSubscription,
+        // Add any missing fields that your backend requires
+        icon: newSubscription.icon || 'globe',
+        color: newSubscription.color || '#808080'
+      };
+      
+      const createdSubscription = await subscriptionService.createSubscription(completeSubscription);
+      console.log('Subscription created successfully:', createdSubscription);
+      
+      // Update local state with the new subscription
+      setSubscriptions([...subscriptions, createdSubscription]);
+      setShowAddModal(false);
+    } catch (error) {
+      console.error('Error creating subscription:', error);
+      alert('Failed to create subscription. Please try again.');
+    }
   };
 
   // Delete subscription handler
-  const handleDeleteSubscription = (id) => {
-    setSubscriptions(subscriptions.filter(sub => sub.id !== id));
+  const handleDeleteSubscription = async (id) => {
+    try {
+      await subscriptionService.deleteSubscription(id);
+      setSubscriptions(subscriptions.filter(sub => sub._id !== id));
+      // Refresh statistics
+      const stats = await subscriptionService.getStatistics();
+      setStatistics(stats);
+    } catch (error) {
+      console.error('Error deleting subscription:', error);
+    }
   };
 
   // Get color based on percentage

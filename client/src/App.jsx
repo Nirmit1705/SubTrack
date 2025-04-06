@@ -9,13 +9,19 @@ import { Footer } from './components/Footer';
 
 // Dashboard component
 import { Dashboard } from './components/dashboard/Dashboard';
+// Import any auth-related components you have
+import { LoginModal } from './components/LoginModal';
+import { SignupModal } from './components/SignupModal'; // Changed to lowercase 'u'
 
-// Landing Page Layout
-const LandingPage = () => {
+// Auth service (create this if you don't have it)
+import authService from './services/authService';
+
+// Landing Page Layout with auth props
+const LandingPage = ({ onLoginClick, onSignupClick }) => {
   return (
     <div className="min-h-screen bg-black text-white">
-      <Navbar />
-      <HeroSection />
+      <Navbar onLoginClick={onLoginClick} onSignupClick={onSignupClick} />
+      <HeroSection onSignupClick={onSignupClick} />
       <FeaturesSection />
       <Footer />
     </div>
@@ -24,8 +30,8 @@ const LandingPage = () => {
 
 // Auth protection helper
 const ProtectedRoute = ({ children }) => {
-  // This is a simplified auth check. In a real app, you'd use a more robust solution.
-  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+  // Use a more reliable auth check
+  const isAuthenticated = authService.isAuthenticated();
   
   if (!isAuthenticated) {
     return <Navigate to="/" replace />;
@@ -35,31 +41,44 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function App() {
-  // For demo purposes - set a flag to show dashboard directly
-  // Remove this in production or replace with proper auth
+  // Define all state variables at the top
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignupModal, setShowSignupModal] = useState(false);
+
+  // Define the auth success handler here
+  const handleAuthSuccess = () => {
+    console.log('Auth success handler called');
+    setIsLoggedIn(true);
+    setShowLoginModal(false);
+    setShowSignupModal(false);
+    
+    console.log('Auth state before redirect:', authService.isAuthenticated());
+    
+    // Force navigation to dashboard
+    console.log('Redirecting to dashboard...');
+    window.location.href = '/dashboard';
+  };
   
   useEffect(() => {
-    // Simulating an authenticated user for demo purposes
-    // Remove this in production or replace with proper auth check
-    const checkAuth = () => {
-      const auth = localStorage.getItem('isAuthenticated');
-      if (auth === 'true') {
-        setIsLoggedIn(true);
-      }
-    };
-    
-    checkAuth();
-    
-    // For demo - uncomment to auto-login
-    // localStorage.setItem('isAuthenticated', 'true');
-    // setIsLoggedIn(true);
+    // Check if user is already authenticated
+    const isAuthenticated = authService.isAuthenticated();
+    setIsLoggedIn(isAuthenticated);
+    console.log('Initial auth state:', isAuthenticated);
   }, []);
-  
+
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LandingPage />} />
+        <Route 
+          path="/" 
+          element={
+            <LandingPage 
+              onLoginClick={() => setShowLoginModal(true)}
+              onSignupClick={() => setShowSignupModal(true)}
+            />
+          } 
+        />
         <Route 
           path="/dashboard" 
           element={
@@ -70,6 +89,31 @@ function App() {
         />
         {/* Add more routes as needed */}
       </Routes>
+      
+      {/* Auth Modals */}
+      {showLoginModal && (
+        <LoginModal 
+          isOpen={showLoginModal}
+          onClose={() => setShowLoginModal(false)}
+          onSuccess={handleAuthSuccess}
+          onSwitchToSignup={() => {
+            setShowLoginModal(false);
+            setShowSignupModal(true);
+          }}
+        />
+      )}
+      
+      {showSignupModal && (
+        <SignupModal // Changed to lowercase 'u'
+          isOpen={showSignupModal}
+          onClose={() => setShowSignupModal(false)}
+          onSuccess={handleAuthSuccess}
+          onSwitchToLogin={() => {
+            setShowSignupModal(false);
+            setShowLoginModal(true);
+          }}
+        />
+      )}
     </Router>
   );
 }

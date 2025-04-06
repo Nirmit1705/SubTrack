@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { subscriptionServices } from '@/lib/subscription-utils';
+import authService from '@/services/authService';
 
 export function AddSubscriptionModal({ isOpen, onClose, onAdd }) {
   const [formData, setFormData] = useState({
@@ -8,8 +8,11 @@ export function AddSubscriptionModal({ isOpen, onClose, onAdd }) {
     price: '',
     category: 'entertainment',
     renewalDate: '',
-    website: '',
-    notes: ''
+    billingCycle: 'monthly', // Add this field
+    icon: 'globe', // Add this field
+    color: '#808080', // Add this field
+    reminderEnabled: true, // Add this field
+    reminderDaysBefore: 3 // Add this field
   });
 
   const handleChange = (e) => {
@@ -22,17 +25,44 @@ export function AddSubscriptionModal({ isOpen, onClose, onAdd }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onAdd({
+    
+    // Add debugging
+    console.log('Is authenticated?', authService.isAuthenticated());
+    console.log('Token:', localStorage.getItem('token'));
+    
+    // Add validation
+    if (!formData.name || !formData.price || !formData.renewalDate) {
+      alert('Please fill in all required fields');
+      return;
+    }
+    
+    // Add more fields that the backend expects
+    const subscriptionData = {
       ...formData,
-      price: parseFloat(formData.price) || 0
-    });
+      price: parseFloat(formData.price) || 0,
+      // Make sure all required fields are present
+      billingCycle: formData.billingCycle || 'monthly',
+      icon: formData.icon || 'globe',
+      color: formData.color || '#808080',
+      reminderEnabled: formData.reminderEnabled !== undefined ? formData.reminderEnabled : true,
+      reminderDaysBefore: formData.reminderDaysBefore || 3
+    };
+    
+    console.log('Submitting subscription data:', subscriptionData);
+    
+    onAdd(subscriptionData);
+    onClose();
+    
     setFormData({
       name: '',
       price: '',
       category: 'entertainment',
       renewalDate: '',
-      website: '',
-      notes: ''
+      billingCycle: 'monthly',
+      icon: 'globe',
+      color: '#808080',
+      reminderEnabled: true,
+      reminderDaysBefore: 3
     });
   };
 

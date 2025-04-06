@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Lock, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,35 +12,37 @@ import {
   ModalDescription,
   ModalFooter,
 } from "@/components/ui/modal";
+import authService from '@/services/authService';
 
 export function LoginModal({ isOpen, onClose, onSwitchToSignup }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   
-  // Use the navigate hook from react-router-dom
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     
-    // Set loading state
-    setIsLoading(true);
-    
-    // Simulate API call with timeout
-    setTimeout(() => {
-      // Store authentication state
-      localStorage.setItem('isAuthenticated', 'true');
+    try {
+      setIsLoading(true);
+      console.log('Attempting login with:', { email });
+      const userData = await authService.login({ email, password });
+      console.log('Login successful:', userData);
       
-      // Reset loading state
-      setIsLoading(false);
-      
-      // Close modal
+      // Close the modal
       onClose();
       
       // Navigate to dashboard
       navigate('/dashboard');
-    }, 1500); // Simulated API delay
+    } catch (err) {
+      console.error('Login failed:', err);
+      setError(err.response?.data?.message || "Login failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
