@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Filter, Grid, List, Plus, Search, Edit, AlertTriangle, ArrowUp, Calendar } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Grid, List, Plus, Search, Edit, AlertTriangle, ArrowUp, Calendar, CreditCard, PieChart as PieChartIcon } from 'lucide-react';
 import { DashboardNavbar } from '@/components/dashboard/Navbar';
 import { SubscriptionCard } from '@/components/dashboard/SubscriptionCard';
 import { FloatingButton } from '@/components/dashboard/FloatingButton';
@@ -60,6 +60,7 @@ export function Dashboard() {
     categorySummary: {}
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [userName, setUserName] = useState(''); // Add state for user's name
 
   // Fetch subscriptions, statistics and user data
   useEffect(() => {
@@ -69,6 +70,10 @@ export function Dashboard() {
         const userData = await userService.getUser();
         if (userData && userData.budget) {
           setBudget(userData.budget);
+        }
+        // Set the user's name
+        if (userData && userData.name) {
+          setUserName(userData.name);
         }
         
         const allSubscriptions = await subscriptionService.getAllSubscriptions();
@@ -304,43 +309,76 @@ export function Dashboard() {
   const categoryData = getCategoryData(filteredSubscriptions);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
+    <div className="min-h-screen relative bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white overflow-hidden">
+      {/* Enhanced animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Large gradient orbs - increased size and intensity */}
+        <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-purple-500/15 rounded-full blur-[150px] animate-pulse" 
+             style={{ animationDuration: '8s' }}></div>
+        <div className="absolute bottom-1/3 right-1/3 w-[500px] h-[500px] bg-blue-500/15 rounded-full blur-[130px] animate-pulse" 
+             style={{ animationDuration: '12s', animationDelay: '1s' }}></div>
+        <div className="absolute top-2/3 right-1/4 w-[400px] h-[400px] bg-indigo-500/15 rounded-full blur-[100px] animate-pulse" 
+             style={{ animationDuration: '10s', animationDelay: '2s' }}></div>
+        
+        {/* Grid overlay */}
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0wIDBoNjB2NjBIMHoiLz48cGF0aCBkPSJNNjAgMzBjMCAxNi41NjgtMTMuNDMyIDMwLTMwIDMwQzEzLjQzMiA2MCAwIDQ2LjU2OCAwIDMwIDAgMTMuNDMyIDEzLjQzMiAwIDMwIDBjMTYuNTY4IDAgMzAgMTMuNDMyIDMwIDMweiIgc3Ryb2tlPSIjMkQzNzQ4IiBzdHJva2Utd2lkdGg9Ii4yNSIgLz48L2c+PC9zdmc+')] opacity-20"></div>
+      </div>
+
       <DashboardNavbar />
 
-      <main className="ml-0 pt-16 transition-all duration-300">
+      {/* Updated padding-top to accommodate fixed navbar */}
+      <main className="ml-0 pt-20 transition-all duration-300 relative z-10">
         <div className="container mx-auto max-w-6xl p-4 md:p-6">
-          {/* Page Title */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-white">
-              Subscriptions Dashboard
-            </h1>
-            <p className="mt-1 text-gray-400">
-              Manage and track all your subscriptions in one place
-            </p>
-          </div>
-
-          {/* Summary section with 3 cards */}
+          {/* Enhanced Hero Section with Greeting - increased gradient effect */}
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="grid grid-cols-1 gap-4 md:grid-cols-3 mb-8"
+            transition={{ duration: 0.7 }}
+            className="mb-10 p-6 rounded-2xl bg-gray-800/40 backdrop-blur-lg border border-gray-700/50 relative overflow-hidden shadow-lg shadow-purple-900/10"
           >
-            {/* Combined Monthly Budget & Utilization Card - Now Clickable */}
+            {/* Floating glow effect similar to hero section */}
+            <div className="absolute -top-20 -right-20 w-64 h-64 bg-purple-500/20 rounded-full blur-[80px]"></div>
+            <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-blue-500/20 rounded-full blur-[80px]"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-800/30 via-gray-900/40 to-black/30 rounded-2xl"></div>
+            
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center relative z-10">
+              <div>
+                <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500">
+                  Welcome, {userName || 'User'}!
+                </h1>
+                <p className="mt-2 text-gray-300 max-w-lg">
+                  Track your subscriptions, manage your budget, and stay on top of your expenses in one place.
+                </p>
+              </div>
+              <div className="mt-4 md:mt-0 bg-gray-800/50 p-3 rounded-lg backdrop-blur-sm border border-gray-700/50">
+                <div className="text-sm text-gray-400">Today's Date</div>
+                <div className="text-lg font-medium">{new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Summary section with enhanced cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            {/* Monthly Budget Card - with improved UI */}
             <motion.div 
-              whileHover={{ y: -5 }}
-              className="overflow-hidden rounded-xl border border-gray-800 bg-gray-900/50 p-6 backdrop-blur-sm cursor-pointer relative group"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              whileHover={{ y: -5, transition: { duration: 0.2 } }}
+              className="overflow-hidden rounded-xl border border-gray-700/50 bg-gradient-to-br from-gray-800/70 to-gray-900/80 backdrop-blur-lg p-6 cursor-pointer relative group shadow-lg shadow-purple-900/10"
               onClick={() => setShowBudgetModal(true)}
             >
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium text-gray-400">Monthly Budget</h3>
-                <span className="rounded-full bg-green-500/20 px-2 py-1 text-xs font-medium text-green-400">
-                  <ArrowUp className="mr-1 inline h-3 w-3" />
-                  4.3%
-                </span>
+              <div className="absolute top-0 right-0 w-20 h-20 bg-purple-500/20 rounded-full -mt-10 -mr-10 blur-[30px]"></div>
+              <div className="absolute bottom-0 left-0 w-16 h-16 bg-blue-500/20 rounded-full -mb-8 -ml-8 blur-[30px]"></div>
+              
+              <div className="flex items-center gap-2 mb-2 relative z-10">
+                <div className="p-2 rounded-lg bg-gray-700/50">
+                  <CreditCard className="h-5 w-5 text-purple-400" />
+                </div>
+                <h3 className="text-sm font-medium text-gray-200">Monthly Budget</h3>
               </div>
               
-              <div className="mt-4 flex flex-col sm:flex-row items-center justify-between">
+              <div className="mt-6 flex flex-col sm:flex-row items-center justify-between relative z-10">
                 <div>
                   <p className="text-3xl font-bold text-white">{formatCurrency(totalMonthly)}</p>
                   <p className="mt-1 text-sm text-gray-400">of {formatCurrency(budget)} budget</p>
@@ -353,7 +391,7 @@ export function Dashboard() {
                       cy="50"
                       r="40"
                       fill="none"
-                      stroke="#2D3748"
+                      stroke="rgba(255,255,255,0.1)"
                       strokeWidth="10"
                     />
                     {/* Circle progress */}
@@ -370,9 +408,9 @@ export function Dashboard() {
                       transform="rotate(-90 50 50)"
                     />
                     <defs>
-                      <linearGradient id="gradient" x1="0%" y1="0%" x2="100%">
-                        <stop offset="0%" stopColor="#8B5CF6" />
-                        <stop offset="100%" stopColor="#3B82F6" />
+                      <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#a78bfa" />
+                        <stop offset="100%" stopColor="#60a5fa" />
                       </linearGradient>
                     </defs>
                   </svg>
@@ -381,28 +419,40 @@ export function Dashboard() {
                   </div>
                 </div>
               </div>
-              <p className={`mt-2 text-center text-sm font-medium ${getBudgetColor()}`}>
-                {percentUsed < 50 ? 'Under Budget 👍' : 
-                percentUsed < 80 ? 'Getting Close 👀' : 
-                percentUsed < 100 ? 'Almost at Limit ⚠️' : 
-                'Over Budget! ❌'}
+              <p className={`mt-6 text-center text-sm font-medium ${getBudgetColor()}`}>
+                {percentUsed < 50 ? 'Under Budget' : 
+                percentUsed < 80 ? 'Getting Close' : 
+                percentUsed < 100 ? 'Almost at Limit' : 
+                'Over Budget!'}
               </p>
-              {/* Edit icon overlay that appears on hover */}
-              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="bg-gray-800 rounded-full p-3">
-                  <Edit className="h-6 w-6 text-blue-400" />
+
+              {/* Improved edit overlay */}
+              <div className="absolute inset-0 bg-gray-900/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                <div className="bg-gray-800/80 backdrop-blur-md rounded-full p-4">
+                  <Edit className="h-6 w-6 text-purple-400" />
                 </div>
-                <p className="absolute bottom-4 text-white text-sm font-medium">Click to edit budget</p>
+                <p className="absolute bottom-6 text-white text-sm font-medium tracking-wide">Edit your budget</p>
               </div>
             </motion.div>
 
-            {/* Category Distribution Card */}
+            {/* Category Distribution Card - with improved UI */}
             <motion.div 
-              whileHover={{ y: -5 }}
-              className="overflow-hidden rounded-xl border border-gray-800 bg-gray-900/50 p-6 backdrop-blur-sm"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              whileHover={{ y: -5, transition: { duration: 0.2 } }}
+              className="overflow-hidden rounded-xl border border-gray-700/50 bg-gradient-to-br from-gray-800/70 to-gray-900/80 backdrop-blur-lg p-6 shadow-lg shadow-blue-900/10 relative"
             >
-              <h3 className="text-sm font-medium text-gray-400">Category Distribution</h3>
-              <div className="h-48 mt-2">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/20 rounded-full -mt-10 -mr-10 blur-[30px]"></div>
+              
+              <div className="flex items-center gap-2 mb-2 relative z-10">
+                <div className="p-2 rounded-lg bg-gray-700/50">
+                  <PieChartIcon className="h-5 w-5 text-blue-400" />
+                </div>
+                <h3 className="text-sm font-medium text-gray-200">Category Distribution</h3>
+              </div>
+              
+              <div className="h-48 mt-4 relative z-10">
                 {filteredSubscriptions.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -425,6 +475,13 @@ export function Dashboard() {
                       <Tooltip 
                         formatter={(value) => formatCurrency(value)}
                         labelFormatter={labelFormatter}
+                        contentStyle={{ 
+                          backgroundColor: 'rgba(31, 41, 55, 0.9)',
+                          borderColor: 'rgba(75, 85, 99, 0.3)',
+                          borderRadius: '0.5rem',
+                        }}
+                        itemStyle={{ color: '#e2e8f0' }}
+                        labelStyle={{ color: '#f8fafc', fontWeight: 'bold' }}
                       />
                     </PieChart>
                   </ResponsiveContainer>
@@ -436,36 +493,62 @@ export function Dashboard() {
               </div>
             </motion.div>
 
-            {/* Next Renewal */}
+            {/* Next Renewal - with improved UI */}
             <motion.div 
-              whileHover={{ y: -5 }}
-              className="overflow-hidden rounded-xl border border-amber-900/50 bg-amber-900/10 p-6 backdrop-blur-sm"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              whileHover={{ y: -5, transition: { duration: 0.2 } }}
+              className="overflow-hidden rounded-xl border border-gray-700/50 bg-gradient-to-br from-gray-800/70 to-gray-900/80 backdrop-blur-lg p-6 shadow-lg shadow-amber-900/10 relative"
             >
-              <div className="flex items-center">
-                <Calendar className="h-5 w-5 text-amber-500" />
-                <h3 className="ml-2 text-sm font-medium text-amber-400">Next Renewal</h3>
+              <div className="absolute top-0 right-0 w-20 h-20 bg-amber-500/10 rounded-full -mt-10 -mr-10 blur-[30px]"></div>
+              
+              <div className="flex items-center gap-2 mb-2 relative z-10">
+                <div className="p-2 rounded-lg bg-gray-700/50">
+                  <Calendar className="h-5 w-5 text-amber-400" />
+                </div>
+                <h3 className="text-sm font-medium text-gray-200">Next Renewal</h3>
               </div>
-              <div className="mt-4 flex items-start gap-3">
-                <div className="rounded-full bg-amber-400/20 p-2">
-                  <AlertTriangle className="h-5 w-5 text-amber-400" />
+              
+              <div className="mt-6 flex items-start gap-3 relative z-10">
+                <div className="rounded-lg bg-gray-700/50 p-3">
+                  <AlertTriangle className="h-6 w-6 text-amber-400" />
                 </div>
                 <div>
-                  <p className="font-medium text-white">{nextRenewal}</p>
-                  <p className="mt-1 text-sm text-amber-200/70">
+                  <p className="font-medium text-white text-lg">{nextRenewal}</p>
+                  <p className="mt-2 text-sm text-gray-400">
                     Don't forget to have sufficient funds
                   </p>
+                  {upcomingRenewals.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.5 }}
+                      className="mt-4 p-2 bg-gray-700/50 rounded-lg border border-gray-700/50"
+                    >
+                      <p className="text-xs text-gray-300">Renews in {Math.ceil((new Date(upcomingRenewals[0].renewalDate) - new Date()) / (1000 * 60 * 60 * 24))} days</p>
+                    </motion.div>
+                  )}
                 </div>
               </div>
             </motion.div>
-          </motion.div>
+          </div>
 
-          {/* Subscriptions List */}
+          {/* Subscriptions List with improved header */}
           <section className="mb-8">
-            <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <h2 className="text-xl font-bold text-white">Your Subscriptions</h2>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+            >
+              <div>
+                <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500">Your Subscriptions</h2>
+                <p className="text-gray-400 text-sm mt-1">Manage all your active subscriptions</p>
+              </div>
               
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                {/* Search */}
+                {/* Improved search */}
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                   <Input
@@ -473,40 +556,35 @@ export function Dashboard() {
                     placeholder="Search subscription..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full rounded-md border-gray-700 bg-gray-800 pl-10 text-white sm:w-64"
+                    className="w-full rounded-md border border-gray-700/50 bg-gray-800/40 pl-10 text-white backdrop-blur-sm sm:w-64 focus:border-blue-500"
                   />
                 </div>
                 
-                {/* View Controls */}
                 <div className="flex items-center gap-2">
-                  <Button
-                    variant={viewMode === 'grid' ? 'default' : 'outline'}
-                    size="icon"
-                    onClick={() => setViewMode('grid')}
-                    className={viewMode === 'grid' 
-                      ? 'bg-gray-700 text-white' 
-                      : 'border-gray-700 text-gray-400 hover:bg-gray-800 hover:text-white'}
-                  >
-                    <Grid className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant={viewMode === 'list' ? 'default' : 'outline'}
-                    size="icon"
-                    onClick={() => setViewMode('list')}
-                    className={viewMode === 'list' 
-                      ? 'bg-gray-700 text-white' 
-                      : 'border-gray-700 text-gray-400 hover:bg-gray-800 hover:text-white'}
-                  >
-                    <List className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-gray-700 text-gray-400 hover:bg-gray-800 hover:text-white ml-2"
-                  >
-                    <Filter className="mr-2 h-4 w-4" />
-                    Filter
-                  </Button>
+                  {/* Improved view mode buttons */}
+                  <div className="bg-gray-800/50 backdrop-blur-sm rounded-md p-1 border border-gray-700/50">
+                    <Button
+                      variant={viewMode === 'grid' ? 'default' : 'outline'}
+                      size="icon"
+                      onClick={() => setViewMode('grid')}
+                      className={viewMode === 'grid' 
+                        ? 'bg-gradient-to-r from-purple-500 to-blue-600 text-white' 
+                        : 'border-0 text-white hover:bg-gray-700 hover:text-white bg-blue-950'}
+                    >
+                      <Grid className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant={viewMode === 'list' ? 'default' : 'outline'}
+                      size="icon"
+                      onClick={() => setViewMode('list')}
+                      className={viewMode === 'list' 
+                        ? 'bg-gradient-to-r from-purple-500 to-blue-600 text-white' 
+                        : 'border-0 text-white hover:bg-gray-700 hover:text-white bg-blue-950'}
+                    >
+                      <List className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
                   <Button
                     variant="default"
                     size="sm"
@@ -518,36 +596,53 @@ export function Dashboard() {
                   </Button>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-            {/* Subscription cards */}
+            {/* Subscription cards with improved UI */}
             {isLoading ? (
-              <div className="text-center py-16">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500"></div>
-                <p className="mt-4 text-gray-400">Loading your subscriptions...</p>
+              <div className="text-center py-16 rounded-xl bg-gray-800/40 backdrop-blur-lg border border-gray-700/50">
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+                <p className="mt-4 text-gray-300">Loading your subscriptions...</p>
               </div>
             ) : filteredSubscriptions.length > 0 ? (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ staggerChildren: 0.1 }}
-                className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}
-              >
-                {filteredSubscriptions.map((subscription, index) => (
-                  <SubscriptionCard 
-                    key={subscription._id || subscription.id || index}
-                    subscription={subscription}
-                    viewMode={viewMode}
-                    onDelete={handleDeleteSubscription} // Pass delete handler
-                    onEdit={openEditModal} // Pass edit handler
-                    delay={index * 0.05}
-                  />
-                ))}
-              </motion.div>
+              <AnimatePresence>
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ staggerChildren: 0.1 }}
+                  className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}
+                >
+                  {filteredSubscriptions.map((subscription, index) => (
+                    <motion.div
+                      key={subscription._id || subscription.id || index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: index * 0.05 }}
+                      whileHover={{ 
+                        y: -5,
+                        boxShadow: '0 10px 25px -5px rgba(124, 58, 237, 0.1)',
+                        transition: { duration: 0.2 } 
+                      }}
+                    >
+                      <SubscriptionCard 
+                        subscription={subscription}
+                        viewMode={viewMode}
+                        onDelete={handleDeleteSubscription}
+                        onEdit={openEditModal}
+                      />
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </AnimatePresence>
             ) : (
-              <div className="flex h-60 flex-col items-center justify-center rounded-xl border border-gray-800 bg-gray-900/50 p-6 text-center">
-                <div className="mb-4 rounded-full bg-gray-800 p-3">
-                  <Search className="h-6 w-6 text-gray-400" />
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="flex h-60 flex-col items-center justify-center rounded-xl border border-gray-700/50 bg-gray-800/40 backdrop-blur-lg p-6 text-center"
+              >
+                <div className="mb-4 rounded-full bg-gray-700/50 p-4">
+                  <Search className="h-6 w-6 text-gray-300" />
                 </div>
                 <h3 className="text-lg font-medium text-white">No subscriptions found</h3>
                 <p className="mt-1 text-gray-400">
@@ -555,18 +650,18 @@ export function Dashboard() {
                 </p>
                 <Button
                   onClick={() => setShowAddModal(true)}
-                  className="mt-4 bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white"
+                  className="mt-6 bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white"
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   Add Subscription
                 </Button>
-              </div>
+              </motion.div>
             )}
           </section>
         </div>
       </main>
 
-      {/* Budget Edit Modal */}
+      {/* Modals */}
       <EditBudgetModal
         isOpen={showBudgetModal}
         onClose={() => setShowBudgetModal(false)}
@@ -574,17 +669,14 @@ export function Dashboard() {
         onSave={handleUpdateBudget}
       />
       
-      {/* Floating action button */}
       <FloatingButton onClick={() => setShowAddModal(true)} />
       
-      {/* Add subscription modal */}
       <AddSubscriptionModal 
         isOpen={showAddModal} 
         onClose={() => setShowAddModal(false)}
         onAdd={handleAddSubscription}
       />
 
-      {/* Edit subscription modal */}
       <EditSubscriptionModal
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}

@@ -27,7 +27,7 @@ export function Navbar() {
               </div>
               
               {/* Site name */}
-              <span className="text-xl font-bold text-white">
+              <span className="text-3xl font-bold text-white">
                 Sub<span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-500">Track</span>
               </span>
             </div>

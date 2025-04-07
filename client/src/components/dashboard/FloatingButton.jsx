@@ -1,16 +1,16 @@
-import { motion } from 'framer-motion';
+import { Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function FloatingButton({ onClick }) {
   return (
-    <motion.button
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.9 }}
-      onClick={onClick}
-      className="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-blue-600 flex items-center justify-center text-white shadow-lg"
-    >
-      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-      </svg>
-    </motion.button>
+    <div className="fixed right-4 bottom-4 z-50">
+      <Button
+        onClick={onClick}
+        className="rounded-full h-14 w-14 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-lg flex items-center justify-center"
+        aria-label="Add subscription"
+      >
+        <Plus className="h-6 w-6" />
+      </Button>
+    </div>
   );
 }
