@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { CalendarDays, CreditCard, Edit2, Trash2, Globe, Music, Video, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getServiceColor } from '@/lib/subscription-utils';
+import { getServiceColor, formatCurrency } from '@/lib/subscription-utils';
 
 // Genre icon mapping using emojis instead of icons for simplicity
 const genreIcons = {
@@ -71,8 +71,8 @@ export function SubscriptionCard({ subscription, viewMode = 'grid', onDelete, on
         </div>
         
         <div className="hidden md:block text-center">
-          <div className="font-medium">${price.toFixed(2)}/mo</div>
-          <div className="text-xs text-gray-400">${(price * 12).toFixed(2)}/year</div>
+          <div className="font-medium">{formatCurrency(price)}/mo</div>
+          <div className="text-xs text-gray-400">{formatCurrency(price * 12)}/year</div>
         </div>
         
         <div className="hidden md:flex items-center gap-2">
@@ -127,7 +127,7 @@ export function SubscriptionCard({ subscription, viewMode = 'grid', onDelete, on
 
         <div className="mt-6 flex items-end justify-between">
           <div>
-            <div className="text-2xl font-bold">${price.toFixed(2)}</div>
+            <div className="text-2xl font-bold">{formatCurrency(price)}</div>
             <div className="text-xs text-gray-400">per month</div>
           </div>
           

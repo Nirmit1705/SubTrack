@@ -1,11 +1,13 @@
 import { motion } from 'framer-motion';
-import { AlertTriangle, ArrowUp, Calendar } from 'lucide-react';
+import { AlertTriangle, ArrowUp, Calendar, Edit } from 'lucide-react';
+import { formatCurrency } from '@/lib/subscription-utils';
 
 export function SummaryWidget({ 
   totalSpending = 89.97, 
   budget = 100, 
   activeSubscriptions = 6,
-  nextRenewal = "Netflix ($14.99) - Tomorrow" 
+  nextRenewal = "Netflix ($14.99) - Tomorrow",
+  onEditBudget // Add this prop
 }) {
   // Calculate percentage of budget used
   const percentUsed = Math.min(100, Math.round((totalSpending / budget) * 100));
@@ -24,21 +26,30 @@ export function SummaryWidget({
       transition={{ duration: 0.5 }}
       className="grid grid-cols-1 gap-4 md:grid-cols-3"
     >
-      {/* Monthly Spending */}
+      {/* Monthly Spending - Now Clickable */}
       <motion.div 
         whileHover={{ y: -5 }}
-        className="overflow-hidden rounded-xl border border-gray-800 bg-gray-900/50 p-6 backdrop-blur-sm"
+        className="overflow-hidden rounded-xl border border-gray-800 bg-gray-900/50 p-6 backdrop-blur-sm cursor-pointer relative group"
+        onClick={onEditBudget}
       >
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium text-gray-400">Monthly Spending</h3>
+          <h3 className="text-sm font-medium text-gray-400">Monthly Budget</h3>
           <span className="rounded-full bg-green-500/20 px-2 py-1 text-xs font-medium text-green-400">
             <ArrowUp className="mr-1 inline h-3 w-3" />
             4.3%
           </span>
         </div>
         <div className="mt-4">
-          <p className="text-3xl font-bold text-white">${totalSpending.toFixed(2)}</p>
-          <p className="mt-1 text-sm text-gray-400">of ${budget} budget</p>
+          <p className="text-3xl font-bold text-white">{formatCurrency(totalSpending)}</p>
+          <p className="mt-1 text-sm text-gray-400">of {formatCurrency(budget)} budget</p>
+        </div>
+        
+        {/* Edit icon overlay that appears on hover */}
+        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="bg-gray-800 rounded-full p-3">
+            <Edit className="h-6 w-6 text-blue-400" />
+          </div>
+          <p className="absolute bottom-4 text-white text-sm font-medium">Click to edit budget</p>
         </div>
       </motion.div>
 

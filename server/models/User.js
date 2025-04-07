@@ -23,7 +23,7 @@ const UserSchema = new mongoose.Schema({
   },
   budget: {
     type: Number,
-    default: 100 // Default monthly budget
+    default: 5000 // Default 5000 INR for Indian users
   },
   currency: {
     type: String,

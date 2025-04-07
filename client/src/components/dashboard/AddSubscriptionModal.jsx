@@ -50,9 +50,14 @@ export function AddSubscriptionModal({ isOpen, onClose, onAdd }) {
     
     console.log('Submitting subscription data:', subscriptionData);
     
-    onAdd(subscriptionData);
+    // Call the onAdd prop instead of doing nothing
+    if (typeof onAdd === 'function') {
+      onAdd(subscriptionData);
+    }
+    
     onClose();
     
+    // Reset form data
     setFormData({
       name: '',
       price: '',
@@ -105,11 +110,14 @@ export function AddSubscriptionModal({ isOpen, onClose, onAdd }) {
               </div>
 
               <div>
+                <label className="block text-gray-700 text-sm font-medium mb-1">
+                  Price (₹)
+                </label>
                 <label htmlFor="price" className="block text-sm font-medium text-gray-400 mb-1">
                   Monthly Price *
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">₹</span>
                   <input
                     id="price"
                     name="price"
@@ -118,7 +126,7 @@ export function AddSubscriptionModal({ isOpen, onClose, onAdd }) {
                     min="0"
                     required
                     className="w-full p-2 pl-8 bg-gray-800 border border-gray-700 rounded-md text-white"
-                    placeholder="9.99"
+                    placeholder="499"
                     value={formData.price}
                     onChange={handleChange}
                   />
@@ -137,6 +145,7 @@ export function AddSubscriptionModal({ isOpen, onClose, onAdd }) {
                   onChange={handleChange}
                 >
                   <option value="entertainment">Entertainment</option>
+                  <option value="music">Music</option>
                   <option value="productivity">Productivity</option>
                   <option value="utilities">Utilities</option>
                   <option value="education">Education</option>

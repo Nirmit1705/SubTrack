@@ -8,7 +8,7 @@ import { FeaturesSection } from './components/FeaturesSection';
 import { Footer } from './components/Footer';
 
 // Dashboard component
-import { Dashboard } from './components/dashboard/Dashboard';
+import { Dashboard } from './pages/Dashboard';
 // Import any auth-related components you have
 import { LoginModal } from './components/LoginModal';
 import { SignupModal } from './components/SignupModal'; // Changed to lowercase 'u'

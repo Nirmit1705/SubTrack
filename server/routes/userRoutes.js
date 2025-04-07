@@ -155,6 +155,41 @@ router.put('/profile', protect, async (req, res) => {
   }
 });
 
+// @desc    Get user profile
+// @route   GET /api/users/me
+// @access  Private
+router.get('/me', protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('-password');
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// @desc    Update user's budget
+// @route   PUT /api/users/budget
+// @access  Private
+router.put('/budget', protect, async (req, res) => {
+  try {
+    const { budget } = req.body;
+    
+    if (budget === undefined || budget < 0) {
+      return res.status(400).json({ message: 'Invalid budget value' });
+    }
+    
+    const user = await User.findByIdAndUpdate(
+      req.user._id, 
+      { budget }, 
+      { new: true }
+    ).select('-password');
+    
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Generate JWT
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {

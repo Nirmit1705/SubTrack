@@ -202,11 +202,13 @@ router.get('/stats/summary', protect, async (req, res) => {
       categorySummary[subscription.category] += monthlyCost;
     });
     
+    // Update stats response:
     res.json({
       totalSubscriptions: subscriptions.length,
       totalMonthlySpending: totalMonthly,
       totalYearlySpending: totalMonthly * 12,
       categorySummary,
+      currency: 'INR'
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
