@@ -6,6 +6,7 @@ import { SubscriptionCard } from '@/components/dashboard/SubscriptionCard';
 import { FloatingButton } from '@/components/dashboard/FloatingButton';
 import { AddSubscriptionModal } from '@/components/dashboard/AddSubscriptionModal';
 import { EditBudgetModal } from '@/components/dashboard/EditBudgetModal';
+import { EditSubscriptionModal } from '@/components/dashboard/EditSubscriptionModal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
@@ -45,6 +46,8 @@ const getCategoryData = (subscriptions) => {
 export function Dashboard() {
   // State management
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false); // State for edit modal
+  const [subscriptionToEdit, setSubscriptionToEdit] = useState(null); // Subscription being edited
   const [showBudgetModal, setShowBudgetModal] = useState(false);
   const [budget, setBudget] = useState(5000); // Default budget for Indian users
   const [subscriptions, setSubscriptions] = useState([]);
@@ -167,16 +170,61 @@ export function Dashboard() {
     }
   };
 
+  // Handle editing a subscription
+  const handleEditSubscription = async (updatedSubscription) => {
+    try {
+      const editedSubscription = await subscriptionService.updateSubscription(updatedSubscription._id, updatedSubscription);
+      setSubscriptions(subscriptions.map(sub => (sub._id === editedSubscription._id ? editedSubscription : sub)));
+      setShowEditModal(false);
+    } catch (error) {
+      console.error('Error updating subscription:', error);
+      alert('Failed to update subscription. Please try again.');
+    }
+  };
+
+  // Open edit modal
+  const openEditModal = (subscription) => {
+    setSubscriptionToEdit(subscription);
+    setShowEditModal(true);
+  };
+
   // Delete subscription handler
   const handleDeleteSubscription = async (id) => {
     try {
+      console.log("Attempting to delete subscription with ID:", id);
+      
+      // Check if id is undefined
+      if (!id) {
+        console.error("Cannot delete subscription: ID is undefined");
+        return;
+      }
+      
+      // Call API to delete subscription
       await subscriptionService.deleteSubscription(id);
-      setSubscriptions(subscriptions.filter(sub => sub._id !== id));
-      // Refresh statistics
-      const stats = await subscriptionService.getStatistics();
-      setStatistics(stats);
+      
+      // Update local state to remove the deleted subscription
+      setSubscriptions(prevSubscriptions => 
+        prevSubscriptions.filter(sub => (sub._id || sub.id) !== id)
+      );
+      
+      // Update filtered subscriptions
+      setFilteredSubscriptions(prevFiltered => 
+        prevFiltered.filter(sub => (sub._id || sub.id) !== id)
+      );
+      
+      // Show success message
+      alert("Subscription deleted successfully");
+      
+      // Refresh statistics only if delete was successful
+      try {
+        const updatedStats = await subscriptionService.getStatistics();
+        setStatistics(updatedStats);
+      } catch (statsError) {
+        console.warn("Failed to refresh statistics:", statsError);
+      }
     } catch (error) {
       console.error('Error deleting subscription:', error);
+      alert("Failed to delete subscription. Please try again.");
     }
   };
 
@@ -427,7 +475,8 @@ export function Dashboard() {
                     key={subscription._id || subscription.id || index}
                     subscription={subscription}
                     viewMode={viewMode}
-                    onDelete={handleDeleteSubscription}
+                    onDelete={handleDeleteSubscription} // Pass delete handler
+                    onEdit={openEditModal} // Pass edit handler
                     delay={index * 0.05}
                   />
                 ))}
@@ -470,6 +519,14 @@ export function Dashboard() {
         isOpen={showAddModal} 
         onClose={() => setShowAddModal(false)}
         onAdd={handleAddSubscription}
+      />
+
+      {/* Edit subscription modal */}
+      <EditSubscriptionModal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        subscription={subscriptionToEdit}
+        onSave={handleEditSubscription}
       />
     </div>
   );

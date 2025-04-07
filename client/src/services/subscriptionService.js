@@ -63,4 +63,22 @@ const subscriptionService = {
   }
 };
 
+// Delete a subscription
+const deleteSubscription = async (id) => {
+  try {
+    // Debug log
+    console.log(`Sending DELETE request for subscription ID: ${id}`);
+    
+    if (!id) {
+      throw new Error("Cannot delete subscription: ID is undefined");
+    }
+    
+    const response = await api.delete(`/subscriptions/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting subscription:', error);
+    throw error;
+  }
+};
+
 export default subscriptionService;

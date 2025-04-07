@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CalendarDays, CreditCard, Edit2, Trash2, Globe, Music, Video, BookOpen } from 'lucide-react';
+import { CalendarDays, CreditCard, Edit2, Trash2, Globe, Music, Video, BookOpen, Edit, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getServiceColor, formatCurrency } from '@/lib/subscription-utils';
 
@@ -28,6 +28,19 @@ const iconMap = {
 export function SubscriptionCard({ subscription, viewMode = 'grid', onDelete, onEdit, delay = 0 }) {
   const [isHovered, setIsHovered] = useState(false);
   const { id, name, price, renewalDate, paymentMethod, icon, color, genre } = subscription;
+  
+  // Log subscription object to debug
+  console.log("Subscription object:", subscription);
+  
+  // Make sure to use the correct ID property
+  const handleDelete = () => {
+    if (window.confirm(`Are you sure you want to delete ${subscription.name}?`)) {
+      // Use _id for MongoDB, id as fallback
+      const subscriptionId = subscription._id || subscription.id;
+      console.log("Deleting subscription with ID:", subscriptionId);
+      onDelete(subscriptionId);
+    }
+  };
   
   // Get the icon component with a simpler fallback
   const IconComponent = iconMap[icon] || Globe;
@@ -85,7 +98,7 @@ export function SubscriptionCard({ subscription, viewMode = 'grid', onDelete, on
         </div>
         
         <button
-          onClick={() => onDelete(id)}
+          onClick={handleDelete}
           className="p-2 text-gray-400 hover:text-red-500 transition-colors"
         >
           <Trash2 className="h-4 w-4" />
@@ -164,7 +177,7 @@ export function SubscriptionCard({ subscription, viewMode = 'grid', onDelete, on
             variant="ghost" 
             size="sm" 
             className="h-6 w-6 p-0 text-gray-400 hover:text-red-500 hover:bg-gray-700"
-            onClick={() => onDelete(id)}
+            onClick={handleDelete}
           >
             <Trash2 className="h-3 w-3" />
           </Button>
