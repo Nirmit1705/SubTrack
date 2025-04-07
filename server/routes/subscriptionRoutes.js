@@ -3,7 +3,6 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Subscription = require('../models/Subscription');
-const { generateReminderNotifications } = require('../utils/reminderUtils');
 
 // Middleware to protect routes
 const protect = async (req, res, next) => {
@@ -79,9 +78,7 @@ router.post('/', protect, async (req, res) => {
       category,
       icon,
       color,
-      billingCycle,
-      reminderEnabled,
-      reminderDaysBefore
+      billingCycle
     } = req.body;
     
     const subscription = await Subscription.create({
@@ -92,15 +89,8 @@ router.post('/', protect, async (req, res) => {
       category,
       icon,
       color,
-      billingCycle,
-      reminderEnabled,
-      reminderDaysBefore
+      billingCycle
     });
-    
-    // Generate reminder notification if enabled
-    if (reminderEnabled) {
-      await generateReminderNotifications(req.user._id);
-    }
     
     res.status(201).json(subscription);
   } catch (error) {
@@ -129,11 +119,6 @@ router.put('/:id', protect, async (req, res) => {
       req.body,
       { new: true, runValidators: true }
     );
-    
-    // Generate new reminder notification if needed
-    if (updatedSubscription.reminderEnabled) {
-      await generateReminderNotifications(req.user._id);
-    }
     
     res.json(updatedSubscription);
   } catch (error) {

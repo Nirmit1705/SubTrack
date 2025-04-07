@@ -82,13 +82,18 @@ export function HeroSection() {
             {[
               { icon: Calendar, title: "Track Renewals", desc: "Get timely reminders" },
               { icon: LineChart, title: "Manage Spending", desc: "Monthly cost insights" },
-              { icon: Bell, title: "Smart Alerts", desc: "Personalized notifications" },
+              { icon: Bell, title: "Smart Alerts", desc: "Personalized notifications", comingSoon: true },
             ].map((feature, index) => (
               <motion.div
                 key={index}
                 whileHover={{ y: -5 }}
-                className="bg-gray-800/40 backdrop-blur-lg rounded-xl p-6 border border-gray-700/50"
+                className="bg-gray-800/40 backdrop-blur-lg rounded-xl p-6 border border-gray-700/50 relative overflow-hidden"
               >
+                {feature.comingSoon && (
+                  <div className="absolute top-2 right-2 w-32 h-8 bg-gradient-to-r from-purple-400 to-blue-500 text-white text-sm font-bold flex items-center justify-center transform rotate-45 translate-x-12 translate-y-0 shadow-lg">
+                  SOON
+                </div>
+                )}
                 <feature.icon className="h-10 w-10 text-purple-400 mb-4" />
                 <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
                 <p className="text-gray-400">{feature.desc}</p>

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
-const User = require('./models/User'); // Add this import
+const User = require('./models/User');
 
 // Load environment variables
 dotenv.config();
@@ -26,24 +26,25 @@ mongoose.connect(process.env.MONGO_URI)
 // Define routes
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/subscriptions', require('./routes/subscriptionRoutes'));
-app.use('/api/notifications', require('./routes/notificationRoutes'));
+// Remove notifications route
+// app.use('/api/notifications', require('./routes/notificationRoutes'));
 
-// Include this route to trigger reminder checks at application startup
-app.get('/api/system/check-reminders', async (req, res) => {
-  try {
-    const users = await User.find({}).select('_id');
-    
-    for (const user of users) {
-      const { generateReminderNotifications } = require('./utils/reminderUtils');
-      await generateReminderNotifications(user._id);
-    }
-    
-    res.json({ message: 'Reminder check completed for all users' });
-  } catch (error) {
-    console.error('Error checking reminders:', error);
-    res.status(500).json({ message: error.message });
-  }
-});
+// Remove reminder check route
+// app.get('/api/system/check-reminders', async (req, res) => {
+//   try {
+//     const users = await User.find({}).select('_id');
+//     
+//     for (const user of users) {
+//       const { generateReminderNotifications } = require('./utils/reminderUtils');
+//       await generateReminderNotifications(user._id);
+//     }
+//     
+//     res.json({ message: 'Reminder check completed for all users' });
+//   } catch (error) {
+//     console.error('Error checking reminders:', error);
+//     res.status(500).json({ message: error.message });
+//   }
+// });
 
 // Basic route for testing
 app.get('/api/test', (req, res) => {

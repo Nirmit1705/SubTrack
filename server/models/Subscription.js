@@ -8,30 +8,24 @@ const SubscriptionSchema = new mongoose.Schema({
   },
   name: {
     type: String,
-    required: [true, 'Subscription name is required'],
+    required: true,
     trim: true
   },
   price: {
     type: Number,
-    required: [true, 'Price is required'],
-    min: [0, 'Price cannot be negative']
+    required: true
   },
   renewalDate: {
     type: Date,
-    required: [true, 'Renewal date is required']
+    required: true
   },
   category: {
     type: String,
-    enum: [
-      'entertainment',
-      'productivity',
-      'utilities',
-      'education',
-      'music',
-      'gaming',
-      'shopping',
-      'other'
-    ],
+    enum: ['entertainment', 'music', 'productivity', 'utilities', 'education', 'other'],
+    default: 'other'
+  },
+  genre: {
+    type: String,
     default: 'other'
   },
   icon: {
@@ -44,53 +38,22 @@ const SubscriptionSchema = new mongoose.Schema({
   },
   billingCycle: {
     type: String,
-    enum: ['monthly', 'yearly', 'quarterly'],
+    enum: ['monthly', 'quarterly', 'yearly'],
     default: 'monthly'
   },
-  reminderEnabled: {
-    type: Boolean,
-    default: true
+  website: {
+    type: String
   },
-  reminderDaysBefore: {
-    type: Number,
-    default: 3,
-    min: 0,
-    max: 30
+  notes: {
+    type: String
+  },
+  paymentMethod: {
+    type: String
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
   }
-}, { timestamps: true });
-
-// Virtual for annual cost
-SubscriptionSchema.virtual('annualCost').get(function() {
-  if (this.billingCycle === 'monthly') {
-    return this.price * 12;
-  } else if (this.billingCycle === 'yearly') {
-    return this.price;
-  } else if (this.billingCycle === 'quarterly') {
-    return this.price * 4;
-  }
-  return this.price * 12; // Default to monthly
 });
-
-// Virtual for next reminder date
-SubscriptionSchema.virtual('reminderDate').get(function() {
-  if (!this.reminderEnabled) return null;
-  
-  const reminderDate = new Date(this.renewalDate);
-  reminderDate.setDate(reminderDate.getDate() - this.reminderDaysBefore);
-  return reminderDate;
-});
-
-// Method to check if reminder should be sent today
-SubscriptionSchema.methods.shouldSendReminder = function() {
-  if (!this.reminderEnabled) return false;
-  
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
-  const reminderDate = this.reminderDate;
-  reminderDate.setHours(0, 0, 0, 0);
-  
-  return reminderDate.getTime() === today.getTime();
-};
 
 module.exports = mongoose.model('Subscription', SubscriptionSchema);

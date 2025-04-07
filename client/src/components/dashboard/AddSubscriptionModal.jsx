@@ -11,8 +11,6 @@ export function AddSubscriptionModal({ isOpen, onClose, onAdd }) {
     billingCycle: 'monthly', // Add this field
     icon: 'globe', // Add this field
     color: '#808080', // Add this field
-    reminderEnabled: true, // Add this field
-    reminderDaysBefore: 3 // Add this field
   });
 
   const handleChange = (e) => {
@@ -44,8 +42,6 @@ export function AddSubscriptionModal({ isOpen, onClose, onAdd }) {
       billingCycle: formData.billingCycle || 'monthly',
       icon: formData.icon || 'globe',
       color: formData.color || '#808080',
-      reminderEnabled: formData.reminderEnabled !== undefined ? formData.reminderEnabled : true,
-      reminderDaysBefore: formData.reminderDaysBefore || 3
     };
     
     console.log('Submitting subscription data:', subscriptionData);
@@ -66,8 +62,6 @@ export function AddSubscriptionModal({ isOpen, onClose, onAdd }) {
       billingCycle: 'monthly',
       icon: 'globe',
       color: '#808080',
-      reminderEnabled: true,
-      reminderDaysBefore: 3
     });
   };
 

@@ -12,6 +12,7 @@ const features = [
     icon: BellRing,
     title: "Smart Notifications",
     description: "Never miss a payment with customizable alerts and reminders.",
+    comingSoon: true,
   },
   {
     icon: Wallet2,
@@ -54,7 +55,12 @@ export function FeaturesSection() {
               viewport={{ once: true }}
               transition={{ delay: index * 0.2, duration: 0.6 }}
             >
-              <Card className="bg-gray-800/40 border-gray-700/50 backdrop-blur-sm hover:bg-gray-800/60 transition-colors">
+              <Card className="bg-gray-800/40 border-gray-700/50 backdrop-blur-sm hover:bg-gray-800/60 transition-colors relative overflow-hidden">
+                {feature.comingSoon && (
+                  <div className="absolute top-2 right-2 w-32 h-8 bg-gradient-to-r from-purple-400 to-blue-500 text-white text-sm font-bold flex items-center justify-center transform rotate-45 translate-x-12 translate-y-0 shadow-lg">
+                    SOON
+                  </div>
+                )}
                 <CardContent className="p-6">
                   <feature.icon className="h-12 w-12 text-purple-400 mb-4" />
                   <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
