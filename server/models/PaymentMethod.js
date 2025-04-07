@@ -13,16 +13,8 @@ const PaymentMethodSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['credit_card', 'debit_card', 'bank_account', 'paypal', 'apple_pay', 'google_pay', 'other'],
+    enum: ['credit_card', 'debit_card', 'UPI', 'cash'],
     default: 'credit_card'
-  },
-  lastFourDigits: {
-    type: String,
-    minlength: 4,
-    maxlength: 4
-  },
-  expiryDate: {
-    type: Date
   },
   isDefault: {
     type: Boolean,

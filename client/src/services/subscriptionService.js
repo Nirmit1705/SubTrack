@@ -1,4 +1,5 @@
 import api from './api';
+import { addMonths, addYears, isBefore } from 'date-fns';
 
 const subscriptionService = {
   getAllSubscriptions: async () => {
@@ -59,6 +60,60 @@ const subscriptionService = {
         totalYearlySpending: 0,
         categorySummary: {}
       };
+    }
+  },
+  
+  checkSubscriptionStatus: async (id) => {
+    try {
+      const subscription = await subscriptionService.getSubscription(id);
+      const today = new Date();
+      const renewalDate = new Date(subscription.renewalDate);
+      
+      // If renewal date is before today and status is active, mark as expired
+      if (isBefore(renewalDate, today) && subscription.status === 'active') {
+        subscription.status = 'expired';
+        await subscriptionService.updateSubscription(id, subscription);
+      }
+      
+      return subscription;
+    } catch (error) {
+      console.error('Error checking subscription status:', error);
+      throw error;
+    }
+  },
+  
+  renewSubscription: async (id) => {
+    try {
+      const subscription = await subscriptionService.getSubscription(id);
+      const today = new Date();
+      let nextRenewalDate;
+      
+      // Calculate next renewal date based on billing cycle
+      switch (subscription.billingCycle) {
+        case 'monthly':
+          nextRenewalDate = addMonths(today, 1);
+          break;
+        case 'quarterly':
+          nextRenewalDate = addMonths(today, 3);
+          break;
+        case 'yearly':
+          nextRenewalDate = addYears(today, 1);
+          break;
+        default:
+          nextRenewalDate = addMonths(today, 1);
+      }
+      
+      // Update subscription with new renewal date and active status
+      const updatedSubscription = {
+        ...subscription,
+        renewalDate: nextRenewalDate,
+        status: 'active'
+      };
+      
+      return await subscriptionService.updateSubscription(id, updatedSubscription);
+    } catch (error) {
+      console.error('Error renewing subscription:', error);
+      throw error;
     }
   }
 };

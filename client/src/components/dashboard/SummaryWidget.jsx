@@ -1,21 +1,28 @@
 import { motion } from 'framer-motion';
 import { AlertTriangle, ArrowUp, Calendar, Edit } from 'lucide-react';
 import { formatCurrency } from '@/lib/subscription-utils';
+import { useEffect, useState } from 'react';
 
 export function SummaryWidget({ 
   totalSpending = 89.97, 
   budget = 100, 
   activeSubscriptions = 6,
   nextRenewal = "Netflix ($14.99) - Tomorrow",
-  onEditBudget // Add this prop
+  onEditBudget 
 }) {
-  // Calculate percentage of budget used
-  const percentUsed = Math.min(100, Math.round((totalSpending / budget) * 100));
+  // Add state to track updates to props
+  const [localPercentUsed, setLocalPercentUsed] = useState(0);
+
+  // Update local state when props change
+  useEffect(() => {
+    const calculatedPercentage = Math.min(100, Math.round((totalSpending / budget) * 100));
+    setLocalPercentUsed(calculatedPercentage);
+  }, [totalSpending, budget]); // Explicitly depend on these props
   
   // Determine color based on percentage
   const getColor = () => {
-    if (percentUsed < 50) return 'text-green-500';
-    if (percentUsed < 80) return 'text-yellow-500';
+    if (localPercentUsed < 50) return 'text-green-500';
+    if (localPercentUsed < 80) return 'text-yellow-500';
     return 'text-red-500';
   };
 
@@ -57,6 +64,7 @@ export function SummaryWidget({
       <motion.div 
         whileHover={{ y: -5 }}
         className="overflow-hidden rounded-xl border border-gray-800 bg-gray-900/50 p-6 backdrop-blur-sm"
+        key={`budget-progress-${localPercentUsed}`} // Add key to force re-render
       >
         <h3 className="text-sm font-medium text-gray-400">Budget Utilization</h3>
         <div className="mt-6 flex items-center justify-center">
@@ -80,8 +88,7 @@ export function SummaryWidget({
                 stroke="url(#gradient)"
                 strokeWidth="10"
                 strokeDasharray="251.2"
-                strokeDashoffset={251.2 - (251.2 * percentUsed) /
-                100}
+                strokeDashoffset={251.2 - (251.2 * localPercentUsed) / 100}
                 strokeLinecap="round"
                 transform="rotate(-90 50 50)"
               />
@@ -93,7 +100,7 @@ export function SummaryWidget({
               </defs>
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
-              <p className={`text-xl font-bold ${getColor()}`}>{percentUsed}%</p>
+              <p className={`text-xl font-bold ${getColor()}`}>{localPercentUsed}%</p>
             </div>
           </div>
         </div>

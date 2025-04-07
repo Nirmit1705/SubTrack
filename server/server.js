@@ -26,6 +26,7 @@ mongoose.connect(process.env.MONGO_URI)
 // Define routes
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/subscriptions', require('./routes/subscriptionRoutes'));
+app.use('/api/payment-methods', require('./routes/paymentMethodRoutes'));
 // Remove notifications route
 // app.use('/api/notifications', require('./routes/notificationRoutes'));
 
@@ -33,12 +34,12 @@ app.use('/api/subscriptions', require('./routes/subscriptionRoutes'));
 // app.get('/api/system/check-reminders', async (req, res) => {
 //   try {
 //     const users = await User.find({}).select('_id');
-//     
+    
 //     for (const user of users) {
 //       const { generateReminderNotifications } = require('./utils/reminderUtils');
 //       await generateReminderNotifications(user._id);
 //     }
-//     
+    
 //     res.json({ message: 'Reminder check completed for all users' });
 //   } catch (error) {
 //     console.error('Error checking reminders:', error);

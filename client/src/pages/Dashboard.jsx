@@ -87,6 +87,45 @@ export function Dashboard() {
     fetchData();
   }, []);
 
+  // Add this to the existing useEffect for loading subscriptions
+  useEffect(() => {
+    const fetchSubscriptionsAndCheckStatus = async () => {
+      setIsLoading(true);
+      try {
+        const fetchedSubscriptions = await subscriptionService.getAllSubscriptions();
+        
+        // Check and update status for each subscription
+        const updatedSubscriptions = await Promise.all(
+          fetchedSubscriptions.map(async (sub) => {
+            // Check if subscription is expired
+            const today = new Date();
+            const renewalDate = new Date(sub.renewalDate);
+            
+            if (renewalDate < today && sub.status === 'active') {
+              sub.status = 'expired';
+              // Only update in database if needed
+              await subscriptionService.updateSubscription(sub._id, sub);
+            }
+            return sub;
+          })
+        );
+        
+        setSubscriptions(updatedSubscriptions);
+        setFilteredSubscriptions(updatedSubscriptions);
+        
+        // Get statistics
+        const stats = await subscriptionService.getStatistics();
+        setStatistics(stats);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSubscriptionsAndCheckStatus();
+  }, []);
+
   // Filter subscriptions based on search query
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -147,11 +186,17 @@ export function Dashboard() {
   const handleAddSubscription = async (newSubscription) => {
     try {
       console.log('Creating subscription:', newSubscription);
+      
+      // Make sure category is explicitly included and not overridden
       const completeSubscription = {
         ...newSubscription,
+        // Keep the selected category, fallback to 'other' only if undefined
+        category: newSubscription.category || 'other',
         icon: newSubscription.icon || 'globe',
         color: newSubscription.color || '#808080'
       };
+      
+      console.log('Sending to server:', completeSubscription); // Debug log
       
       const createdSubscription = await subscriptionService.createSubscription(completeSubscription);
       console.log('Subscription created successfully:', createdSubscription);
@@ -173,9 +218,27 @@ export function Dashboard() {
   // Handle editing a subscription
   const handleEditSubscription = async (updatedSubscription) => {
     try {
-      const editedSubscription = await subscriptionService.updateSubscription(updatedSubscription._id, updatedSubscription);
-      setSubscriptions(subscriptions.map(sub => (sub._id === editedSubscription._id ? editedSubscription : sub)));
+      const result = await subscriptionService.updateSubscription(
+        updatedSubscription._id, 
+        updatedSubscription
+      );
+      
+      // Update the subscriptions in state
+      setSubscriptions(current => 
+        current.map(sub => sub._id === result._id ? result : sub)
+      );
+      
+      // Update filtered subscriptions
+      setFilteredSubscriptions(current => 
+        current.map(sub => sub._id === result._id ? result : sub)
+      );
+      
+      // Close the modal
       setShowEditModal(false);
+      
+      // Refresh statistics to reflect any price or status changes
+      const stats = await subscriptionService.getStatistics();
+      setStatistics(stats);
     } catch (error) {
       console.error('Error updating subscription:', error);
       alert('Failed to update subscription. Please try again.');

@@ -1,12 +1,33 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import userService from '@/services/userService';
 
 export function DashboardNavbar() {
   const [notifications] = useState(3);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [user, setUser] = useState({ name: 'User' }); // Default value until data is loaded
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+
+  // Fetch user data when component mounts
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userData = await userService.getUser();
+        setUser(userData);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        // If API call fails, try to get user from localStorage
+        const localUser = JSON.parse(localStorage.getItem('user'));
+        if (localUser && localUser.name) {
+          setUser(localUser);
+        }
+      }
+    };
+    
+    fetchUserData();
+  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -37,6 +58,11 @@ export function DashboardNavbar() {
     }
   };
 
+  // Get the first letter of the user's name for the avatar
+  const getInitial = () => {
+    return user && user.name ? user.name.charAt(0).toUpperCase() : 'U';
+  };
+
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
@@ -64,12 +90,10 @@ export function DashboardNavbar() {
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             >
               <div className="h-8 w-8 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 flex items-center justify-center">
-                <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
+                <span className="text-white font-medium">{getInitial()}</span>
               </div>
               <span className="text-sm font-medium text-gray-200 hidden sm:inline-block">
-                John Doe
+                {user.name}
               </span>
               <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />

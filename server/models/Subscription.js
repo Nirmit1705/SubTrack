@@ -19,6 +19,12 @@ const SubscriptionSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
+  // Add status field to track subscription state
+  status: {
+    type: String,
+    enum: ['active', 'expired', 'canceled'],
+    default: 'active'
+  },
   category: {
     type: String,
     enum: ['entertainment', 'music', 'productivity', 'utilities', 'education', 'other'],

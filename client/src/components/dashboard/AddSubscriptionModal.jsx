@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import authService from '@/services/authService';
 
@@ -8,10 +8,13 @@ export function AddSubscriptionModal({ isOpen, onClose, onAdd }) {
     price: '',
     category: 'entertainment',
     renewalDate: '',
-    billingCycle: 'monthly', // Add this field
-    icon: 'globe', // Add this field
-    color: '#808080', // Add this field
+    billingCycle: 'monthly',
+    icon: 'globe',
+    color: '#808080',
+    paymentMethod: 'credit_card', // Default payment method
   });
+  
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,10 +26,6 @@ export function AddSubscriptionModal({ isOpen, onClose, onAdd }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    // Add debugging
-    console.log('Is authenticated?', authService.isAuthenticated());
-    console.log('Token:', localStorage.getItem('token'));
     
     // Add validation
     if (!formData.name || !formData.price || !formData.renewalDate) {
@@ -44,9 +43,7 @@ export function AddSubscriptionModal({ isOpen, onClose, onAdd }) {
       color: formData.color || '#808080',
     };
     
-    console.log('Submitting subscription data:', subscriptionData);
-    
-    // Call the onAdd prop instead of doing nothing
+    // Call the onAdd prop
     if (typeof onAdd === 'function') {
       onAdd(subscriptionData);
     }
@@ -62,6 +59,7 @@ export function AddSubscriptionModal({ isOpen, onClose, onAdd }) {
       billingCycle: 'monthly',
       icon: 'globe',
       color: '#808080',
+      paymentMethod: 'credit_card',
     });
   };
 
@@ -160,6 +158,43 @@ export function AddSubscriptionModal({ isOpen, onClose, onAdd }) {
                   value={formData.renewalDate}
                   onChange={handleChange}
                 />
+              </div>
+              
+              <div>
+                <label htmlFor="billingCycle" className="block text-sm font-medium text-gray-400 mb-1">
+                  Billing Cycle
+                </label>
+                <select
+                  id="billingCycle"
+                  name="billingCycle"
+                  className="w-full p-2 bg-gray-800 border border-gray-700 rounded-md text-white"
+                  value={formData.billingCycle}
+                  onChange={handleChange}
+                >
+                  <option value="monthly">Monthly</option>
+                  <option value="quarterly">Quarterly</option>
+                  <option value="yearly">Yearly</option>
+                </select>
+              </div>
+              
+              {/* Payment Method Selection - Simplified */}
+              <div>
+                <label htmlFor="paymentMethod" className="block text-sm font-medium text-gray-400 mb-1">
+                  Payment Method *
+                </label>
+                <select
+                  id="paymentMethod"
+                  name="paymentMethod"
+                  required
+                  className="w-full p-2 bg-gray-800 border border-gray-700 rounded-md text-white"
+                  value={formData.paymentMethod}
+                  onChange={handleChange}
+                >
+                  <option value="credit_card">Credit Card</option>
+                  <option value="debit_card">Debit Card</option>
+                  <option value="upi">UPI</option>
+                  <option value="cash">Cash</option>
+                </select>
               </div>
 
               <div>
