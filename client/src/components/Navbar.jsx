@@ -4,6 +4,7 @@ import { LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LoginModal } from '@/components/LoginModal';
 import { SignupModal } from '@/components/SignupModal';
+import BellIcon from '@/assets/bell-icon.png';
 
 export function Navbar() {
   const [showLogin, setShowLogin] = useState(false);
@@ -21,10 +22,12 @@ export function Navbar() {
           {/* Logo and site name */}
           <div className="flex items-center">
             <div className="flex items-center">
-              {/* Logo icon */}
-              <div className="w-8 h-8 rounded-md bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center text-white font-bold mr-2">
-                S
-              </div>
+              {/* Replace logo icon with the image */}
+              <img 
+                src={BellIcon} 
+                alt="Logo" 
+                className="w-8 h-8 rounded-md mr-2" 
+              />
               
               {/* Site name */}
               <span className="text-3xl font-bold text-white">

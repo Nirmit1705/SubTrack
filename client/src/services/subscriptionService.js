@@ -20,7 +20,13 @@ const subscriptionService = {
   createSubscription: async (subscriptionData) => {
     try {
       console.log('Creating subscription with data:', subscriptionData);
-      const response = await api.post('/subscriptions', subscriptionData);
+      // Ensure paymentMethod is included in the data being sent
+      const completeData = {
+        ...subscriptionData,
+        paymentMethod: subscriptionData.paymentMethod || 'credit_card',
+      };
+      
+      const response = await api.post('/subscriptions', completeData);
       console.log('Subscription created:', response.data);
       return response.data;
     } catch (error) {

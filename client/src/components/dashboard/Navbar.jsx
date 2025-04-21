@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import userService from '@/services/userService';
+import BellIcon from '@/assets/bell-icon.png';
 
 export function DashboardNavbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -72,9 +73,11 @@ export function DashboardNavbar() {
       <div className="flex h-16 items-center justify-between px-4 md:px-6">
         <div className="flex items-center gap-2">
           <div className="flex items-center">
-            <div className="w-8 h-8 rounded-md bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center text-white font-bold mr-2">
-              S
-            </div>
+            <img 
+              src={BellIcon} 
+              alt="Logo" 
+              className="w-8 h-8 rounded-md mr-2" 
+            />
             <span className="text-3xl font-bold text-white hidden md:inline-block">
               Sub<span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-500">Track</span>
             </span>

@@ -41,7 +41,11 @@ export function AddSubscriptionModal({ isOpen, onClose, onAdd }) {
       billingCycle: formData.billingCycle || 'monthly',
       icon: formData.icon || 'globe',
       color: formData.color || '#808080',
+      // Explicitly include paymentMethod to ensure it's sent to the server
+      paymentMethod: formData.paymentMethod || 'credit_card',
     };
+    
+    console.log('Sending subscription data:', subscriptionData); // Debug log
     
     // Call the onAdd prop
     if (typeof onAdd === 'function') {

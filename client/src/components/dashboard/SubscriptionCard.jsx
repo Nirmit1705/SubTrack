@@ -24,6 +24,9 @@ const paymentMethodTypeMap = {
 const getPaymentMethodDisplay = (paymentMethod) => {
   if (!paymentMethod) return 'No payment method';
   
+  // For debugging
+  console.log('Payment method received:', paymentMethod);
+  
   // If it's already one of our display values, return as is
   if (Object.values(paymentMethodTypeMap).includes(paymentMethod)) {
     return paymentMethod;
@@ -42,10 +45,13 @@ export function SubscriptionCard({ subscription, viewMode = 'grid', onDelete, on
     name = 'Unknown', 
     price = 0, 
     renewalDate = new Date(), 
-    paymentMethod,
+    paymentMethod = 'credit_card', // Provide default here
     icon = 'globe',
     color = '#808080'
   } = subscription || {};
+  
+  // Ensure payment method is properly extracted
+  console.log('Subscription payment method:', paymentMethod);
   
   // Get category value - prioritizing the category field but falling back to genre if needed
   const category = subscription?.category || subscription?.genre || 'other';
@@ -127,12 +133,21 @@ export function SubscriptionCard({ subscription, viewMode = 'grid', onDelete, on
           <span className={`text-sm ${renewalStatus.color}`}>{renewalStatus.text}</span>
         </div>
         
-        <button
-          onClick={handleDelete}
-          className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-        >
-          <Trash2 className="h-4 w-4" />
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Added Edit button */}
+          <button
+            onClick={() => onEdit(subscription)}
+            className="p-2 text-gray-400 hover:text-blue-500 transition-colors"
+          >
+            <Edit className="h-4 w-4" />
+          </button>
+          <button
+            onClick={handleDelete}
+            className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        </div>
       </motion.div>
     );
   }

@@ -192,13 +192,15 @@ export function Dashboard() {
     try {
       console.log('Creating subscription:', newSubscription);
       
-      // Make sure category is explicitly included and not overridden
+      // Make sure category and payment method are explicitly included
       const completeSubscription = {
         ...newSubscription,
         // Keep the selected category, fallback to 'other' only if undefined
         category: newSubscription.category || 'other',
         icon: newSubscription.icon || 'globe',
-        color: newSubscription.color || '#808080'
+        color: newSubscription.color || '#808080',
+        // Ensure payment method is included
+        paymentMethod: newSubscription.paymentMethod || 'credit_card',
       };
       
       console.log('Sending to server:', completeSubscription); // Debug log
